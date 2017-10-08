@@ -15,8 +15,6 @@ class Parser
 	size_t firstCharacter;
 	size_t lastCharacter;
 
-	// string currentSymbol;
-
 public:
 	string currentCommand;
 	string destField, compField, jumpField;
@@ -31,7 +29,6 @@ public:
 		}
 		else
 			cout << "Unable to open file" << endl;
-		//auto back_to_cstr = filename.c_str();
 	}
 	~Parser()
 	{
@@ -71,7 +68,6 @@ public:
 			getline(inputFileStream, currentCommand);
 			currentCommand = currentCommand.substr(0, currentCommand.find("//"));
 			currentCommand.erase(remove_if(currentCommand.begin(), currentCommand.end(), isspace), currentCommand.end());
-			//cout << '\n' << currentCommand << '\n';
 		}
 		else
 			cout << "Reached end of file.." << endl;
@@ -80,8 +76,6 @@ public:
 	}
 	commandType commandType()
 	{
-
-		// cout << "\nCurrent command is " << currentCommand << endl;
 		firstCharacter = currentCommand.find_first_not_of(" \t\r\n");
 		if (string::npos == firstCharacter)
 		{
@@ -119,14 +113,10 @@ public:
 	{
 		string delimiter = "=";
 		size_t pos = 0;
-		// string token;
-		// cout << currentCommand << endl;
 		while ((pos = currentCommand.find(delimiter)) != string::npos) {
 			destField = currentCommand.substr(0, pos);
-			// cout << destField << endl;
 			currentCommand.erase(0, pos + delimiter.length());
 		}
-		//  cout << currentCommand << endl;
 		return destField;
 	}
 
@@ -134,8 +124,6 @@ public:
 	{
 		string delimiter = ";";
 		size_t pos = 0;
-		// string token;
-		// cout << currentCommand << endl;
 		if (currentCommand.find(delimiter) == string::npos)
 		{
 			compField = currentCommand;
@@ -146,16 +134,13 @@ public:
 		{
 			while ((pos = currentCommand.find(delimiter)) != string::npos) {
 				compField = currentCommand.substr(0, pos);
-				// cout << compField << endl;
 				currentCommand.erase(0, pos + delimiter.length());
 			}
-			// cout << currentCommand << endl;
 			return compField;
 		}
 	}
 	string jump()
 	{
-		// cout << currentCommand << endl;
 		return currentCommand;
 	}
 };
@@ -164,8 +149,7 @@ class SymbolTable
 {
 	vector<string> symbolNameArray; // declaration
 	vector<int> symbolAddressArray; // declaration
-	// string * symbolNameArray;
-	//int * symbolAddressArray;
+
 public:
 	int symbolCounter;
 	SymbolTable() {
@@ -185,17 +169,20 @@ public:
 		symbolCounter++;
 		return;
 	}
+	void updateEntry(string inputSymbol, int symbolAddress)
+	{
+		vector<string>::iterator iter = find(symbolNameArray.begin(), symbolNameArray.end(), inputSymbol);
+		size_t index = std::distance(symbolNameArray.begin(), iter);
+		symbolAddressArray.at(index) = symbolAddress;
+		return;
+	}
 	bool contains(string inputSymbol)
 	{
 		if (find(symbolNameArray.begin(), symbolNameArray.end(), inputSymbol) != symbolNameArray.end())
 		{
 			return true; // Element in vector.
 		}
-		else //for (int i = 0; i < sizeof(symbolNameArray); i++)
-		//{
-		//	if (symbolNameArray[i] == inputSymbol)
-		//		return true;
-		//}
+		else 
 		return false;
 	}
 	int getAddress(string inputSymbol)
@@ -417,7 +404,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		cout << "You must input a single assembly (.asm) file!" << endl;
 		return 1;
 	}
-	int instructionCounter = 16;
+	int instructionCounter = 0;
 	int lineCounter = 0;
 	int currentSymbolAddress = 0;
 
@@ -440,11 +427,9 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		currentCode = "";
 		AsmParser.advance();
 		commandType currentCommandType = AsmParser.commandType();
-		// cout << "Command Type is : " << currentCommandType << endl;
 		if (currentCommandType == A_Command)
 		{
 			parsedSymbol = AsmParser.symbol();
-			// cout << "Symbol is: " << parsedSymbol << endl;
 			if (AsmParser.constantCheck(parsedSymbol))
 			{
 			}
@@ -462,7 +447,10 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		{
 			parsedSymbol = AsmParser.symbol();
 
-			if (AsmSymbolTable.contains(parsedSymbol)) {}
+			if (AsmSymbolTable.contains(parsedSymbol))
+			{
+				AsmSymbolTable.updateEntry(parsedSymbol, instructionCounter);
+			}
 			else
 			{
 				AsmSymbolTable.addEntry(parsedSymbol, instructionCounter);
@@ -483,16 +471,16 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		currentCode = "";
 		AsmParser.advance();
 		commandType currentCommandType = AsmParser.commandType();
-		cout << "\nCurrent command is " << AsmParser.currentCommand << endl;
-		cout << "Command Type is : " << currentCommandType << endl;
+		//cout << "\nCurrent command is " << AsmParser.currentCommand << endl;
+		//cout << "Command Type is : " << currentCommandType << endl;
 		if (currentCommandType == A_Command)
 		{
 			parsedSymbol = AsmParser.symbol();
-			cout << "Symbol is: " << parsedSymbol << endl;
+			//cout << "Symbol is: " << parsedSymbol << endl;
 			if (AsmParser.constantCheck(parsedSymbol))
 			{
 				int decimalSymbol = stoi(parsedSymbol);
-				cout << "Symbol integer = " << decimalSymbol << endl;
+				//cout << "Symbol integer = " << decimalSymbol << endl;
 				symbolCoded = bitset< 15 >(decimalSymbol).to_string();
 
 			}
@@ -509,32 +497,19 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 				}
 			}
 			currentCode = "0" + symbolCoded;
-
 			instructionCounter++;
 		}
 		if (currentCommandType == L_Command)
 		{
-			/*
-			parsedSymbol = AsmParser.symbol();
-			cout << "Symbol is: " << parsedSymbol << endl;
-			if (AsmSymbolTable.contains(parsedSymbol))
-			{
-				currentSymbolAddress = AsmSymbolTable.getAddress(parsedSymbol);
-			}
-			else
-			{
-		//		AsmSymbolTable.addEntry(parsedSymbol, instructionCounter);
-			}
-			*/
 		}
 		if (currentCommandType == C_Command)
 		{
 			parsedDest = AsmParser.dest();
 			parsedComp = AsmParser.comp();
 			parsedJump = AsmParser.jump();
-			cout << "Dest is: " << parsedDest << endl;
-			cout << "Comp is: " << parsedComp << endl;
-			cout << "Jump is: " << parsedJump << endl;
+			//cout << "Dest is: " << parsedDest << endl;
+			//cout << "Comp is: " << parsedComp << endl;
+			//cout << "Jump is: " << parsedJump << endl;
 			codeDest = Code.dest(parsedDest);
 			codeComp = Code.comp(parsedComp);
 			codeJump = Code.jump(parsedJump);
@@ -548,7 +523,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 				instructionCounter++;
 			}
 		}
-		cout << "Current command code = " << currentCode << endl;
+		// cout << "Current command code = " << currentCode << endl;
 		if (currentCode != ""){ codeList.push_back(currentCode); }
 		
 	}
