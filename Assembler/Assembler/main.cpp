@@ -151,12 +151,10 @@ class SymbolTable
 	vector<int> symbolAddressArray; // declaration
 
 public:
-	int symbolCounter;
 	SymbolTable() {
 		symbolNameArray = { "R0","R1","R2","R3","R4","R5","R6","R7","R8","R9","R10","R11","R12","R13","R14","R15",\
 			"SP","LCL","ARG","THIS","THAT","SCREEN","KBD" };
 		symbolAddressArray = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,1,2,3,4,16384,24576 };
-		symbolCounter = 16;
 	}
 	~SymbolTable()
 	{
@@ -166,7 +164,6 @@ public:
 	{
 		symbolNameArray.push_back(inputSymbol);
 		symbolAddressArray.push_back(symbolAddress);
-		symbolCounter++;
 		return;
 	}
 	void updateEntry(string inputSymbol, int symbolAddress)
@@ -405,9 +402,8 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		return 1;
 	}
 	int instructionCounter = 0;
-	int lineCounter = 0;
 	int currentSymbolAddress = 0;
-
+	int symbolCounter = 16;
 	string filename(argv[1]);
 	string outputFileName;
 	ofstream outputFileStream;
@@ -422,6 +418,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	////**********************************************************
 	////FIRST PASS***********************************************
 	// find the symbols, add them to symbol table
+	int testCounter = 1;
 	while (AsmParser.hasMoreCommands())
 	{
 		currentCode = "";
@@ -429,18 +426,6 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		commandType currentCommandType = AsmParser.commandType();
 		if (currentCommandType == A_Command)
 		{
-			parsedSymbol = AsmParser.symbol();
-			if (AsmParser.constantCheck(parsedSymbol))
-			{
-			}
-			else
-			{
-				if (AsmSymbolTable.contains(parsedSymbol)) {}
-				else
-				{
-					AsmSymbolTable.addEntry(parsedSymbol, instructionCounter);
-				}
-			}
 			instructionCounter++;
 		}
 		if (currentCommandType == L_Command)
@@ -461,6 +446,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		{
 			instructionCounter++;
 		}
+		testCounter++;
 	}
 	AsmParser.reset();
 	/////////////////////////////////////////////////////////////
@@ -482,22 +468,23 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 				int decimalSymbol = stoi(parsedSymbol);
 				//cout << "Symbol integer = " << decimalSymbol << endl;
 				symbolCoded = bitset< 15 >(decimalSymbol).to_string();
-
 			}
 			else
 			{
 				if (AsmSymbolTable.contains(parsedSymbol)) {
+					
 					currentSymbolAddress = AsmSymbolTable.getAddress(parsedSymbol);
 					symbolCoded = bitset< 15 >(currentSymbolAddress).to_string();
 				}
 				else
 				{
-					//		AsmSymbolTable.addEntry(parsedSymbol, currentSymbolAddress);
-
+							AsmSymbolTable.addEntry(parsedSymbol,symbolCounter);
+							symbolCoded = bitset< 15 >(symbolCounter).to_string();
+							symbolCounter++;
+				
 				}
 			}
 			currentCode = "0" + symbolCoded;
-			instructionCounter++;
 		}
 		if (currentCommandType == L_Command)
 		{
@@ -520,7 +507,6 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 			}
 			else {
 				currentCode = "111" + codeComp + codeDest + codeJump;
-				instructionCounter++;
 			}
 		}
 		// cout << "Current command code = " << currentCode << endl;
@@ -530,7 +516,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	AsmParser.reset();
 
 	outputFileName = (filename.substr(0, filename.find("."))) + ".hack";
-	outputFileStream.open(outputFileName, ofstream::out); // | ofstream::app);
+	outputFileStream.open(outputFileName, ofstream::out);
 	for (unsigned int i = 0; i < codeList.size(); i++)
 		outputFileStream << codeList[i] << endl;
 	outputFileStream.close();
