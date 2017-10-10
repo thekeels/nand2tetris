@@ -6,6 +6,8 @@
 #include <vector>
 #include <algorithm>
 #include <iterator>
+
+#include <io.h>
 using namespace std;
 
 enum commandType { C_ARITHMETIC, C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF, C_FUNCTION, C_RETURN, C_CALL, C_ERROR, C_NULL };
@@ -44,23 +46,7 @@ public:
 		cout << "Destroying Parser" << endl;
 		inputFileStream.close();
 	}
-	//	void reset()
-	//	{
-	//		inputFileStream.clear();
-	//		inputFileStream.seekg(0, ios::beg);
-	//		return;
-	//	}
-	//	bool constantCheck(string &A_commandSymbol)
-	//	{
-	//		if ((A_commandSymbol.at(0) == '0') || (A_commandSymbol.at(0) == '1') || (A_commandSymbol.at(0) == '2') \
-	//			|| (A_commandSymbol.at(0) == '3') || (A_commandSymbol.at(0) == '4') || (A_commandSymbol.at(0) == '5') \
-	//			|| (A_commandSymbol.at(0) == '6') || (A_commandSymbol.at(0) == '7') || (A_commandSymbol.at(0) == '8') \
-	//			|| (A_commandSymbol.at(0) == '9'))
-	//		{
-	//			return true;
-	//		}
-	//		else return false;
-	//	}
+
 	bool hasMoreCommands()
 	{
 		if (inputFileStream.eof())
@@ -158,11 +144,12 @@ class CodeWriter
 	int jeqCounter = 0;
 	int jleCounter = 0;
 	int jgeCounter = 0;
-	string staticVariable;
+	
 //	vector<string> symbolNameArray; // declaration
 //	vector<int> symbolAddressArray; // declaration
 //
 public:
+	string staticVariable;
 	CodeWriter(string filename) 
 	{
 		outputFileName = (filename.substr(0, filename.find("."))) + ".asm";
@@ -310,7 +297,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 										// argc = number of strings pointed to by argv
 										// argv holds the array of inputs to the program, argv[0] holds "Assembler", argv[1] holds command line input
 {
-
+	void DumpEntry(_finddata_t &data);
 	if (argc != 2)
 	{
 		cout << "You must input a single vm file (.vm) or a directory containing multiple vm files!" << endl;
@@ -322,144 +309,109 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 
 	string filename(argv[1]);
 	string inputFileName, inputDirectory;
-	Parser VMParser(filename);
 
+	vector<string> fileList;
+	_finddata_t data;
+	size_t last_slash_idx = filename.find_last_of("\\/");
+	//size_t fileStartPos = filename.find_last_of("/\\");
 	// CODE to check -- is input a directory or single .vm file?
-	if (filename.find(".vm"))
+	if (filename.find(".vm")!=string::npos)
 	{
-		inputFileName = (filename.substr(0, filename.find(".vm")));
+
+		bool directoryCheck = false;
+		filename.erase(0, last_slash_idx + 1);
+		//const size_t period_idx = filename.rfind('.'); // Remove extension if present.
+		//filename.erase(period_idx);
+		//inputFileName = (filename.substr(last_slash_idx+1, filename.find(".vm")));
+		fileList.push_back(filename);
+		inputFileName = filename;
 	}
 	else
 	{
-		inputDirectory = filename;
-	}
-	CodeWriter CodeWriter(inputFileName);
-	//string parsedSymbol, parsedDest, parsedComp, parsedJump;
-	//string codeDest, codeComp, codeJump;
-	//string currentCode, symbolCoded;
-	//vector<string> codeList;
-	//SymbolTable AsmSymbolTable;
-	///////////////////////////////////////////////////////////////
-	//////**********************************************************
-	//////FIRST PASS***********************************************
-	//// find the symbols, add them to symbol table
-	while (VMParser.hasMoreCommands())
-	{
-		//	currentCode = "";
-		VMParser.advance();
-		commandType currentCommandType = VMParser.commandType();
-		if (currentCommandType != C_NULL)
+		// Fancy code from http://www.dummies.com/programming/cpp/how-to-get-the-contents-of-a-directory-in-c/ to find files in a directory
+		if (filename.back() = '\\')
 		{
-			if (currentCommandType == C_ARITHMETIC)
+			const size_t backslashIndex = filename.rfind('\\');
+			filename.erase(backslashIndex);
+			last_slash_idx = filename.find_last_of("\\/");
+		}
+		inputDirectory = filename.substr(last_slash_idx+1);
+		inputFileName = inputDirectory;
+		filename = filename + "\\*.vm";
+		intptr_t ff = _findfirst(filename.c_str(), &data);
+		if (ff != -1)
+		{
+			int res = 0;
+			while (res != -1)
 			{
-				CodeWriter.writeArithmetic(VMParser.currentCommand);
+				DumpEntry(data);
+				//string temp = data.name;
+				//temp = temp.substr(0, temp.find(".vm"));
+				fileList.push_back(data.name);
+				res = _findnext(ff, &data);
 			}
-			else if (currentCommandType == C_RETURN) {}
-			else VMParser.arg1();
-			if ((currentCommandType == C_PUSH) || (currentCommandType == C_POP) || (currentCommandType == C_FUNCTION) || (currentCommandType == C_CALL))
-			{
-				VMParser.arg2();
-			}
-			else {}
-
-			if ((currentCommandType == C_PUSH) || (currentCommandType == C_POP))
-			{
-				CodeWriter.writePushPop(currentCommandType,VMParser.argument1, VMParser.argument2);
-			}
-
-			else {}
-			//	if (currentCommandType == L_Command)
-			//	{
-			//		parsedSymbol = AsmParser.symbol();
-
-			//		if (AsmSymbolTable.contains(parsedSymbol))
-			//		{
-			//			AsmSymbolTable.updateEntry(parsedSymbol, instructionCounter);
-			//		}
-			//		else
-			//		{
-			//			AsmSymbolTable.addEntry(parsedSymbol, instructionCounter);
-			//		}
-
-			//	}
-			//	if (currentCommandType == C_Command)
-			//	{
-			//		instructionCounter++;
-			//	}
-			//	testCounter++;
+			_findclose(ff);
 		}
 	}
-	//AsmParser.reset();
-	///////////////////////////////////////////////////////////////
-	//////**********************************************************
-	//////SECOND PASS***********************************************
-	//while (AsmParser.hasMoreCommands())
-	//{
-	//	currentCode = "";
-	//	AsmParser.advance();
-	//	commandType currentCommandType = AsmParser.commandType();
-	//	//cout << "\nCurrent command is " << AsmParser.currentCommand << endl;
-	//	//cout << "Command Type is : " << currentCommandType << endl;
-	//	if (currentCommandType == A_Command)
-	//	{
-	//		parsedSymbol = AsmParser.symbol();
-	//		//cout << "Symbol is: " << parsedSymbol << endl;
-	//		if (AsmParser.constantCheck(parsedSymbol))
-	//		{
-	//			int decimalSymbol = stoi(parsedSymbol);
-	//			//cout << "Symbol integer = " << decimalSymbol << endl;
-	//			symbolCoded = bitset< 15 >(decimalSymbol).to_string();
-	//		}
-	//		else
-	//		{
-	//			if (AsmSymbolTable.contains(parsedSymbol)) {
 
-	//				currentSymbolAddress = AsmSymbolTable.getAddress(parsedSymbol);
-	//				symbolCoded = bitset< 15 >(currentSymbolAddress).to_string();
-	//			}
-	//			else
-	//			{
-	//				AsmSymbolTable.addEntry(parsedSymbol, symbolCounter);
-	//				symbolCoded = bitset< 15 >(symbolCounter).to_string();
-	//				symbolCounter++;
+	if (fileList.size() == 0)
+	{
+		cout << "No .vm files were located. Exiting..." << endl;
+		return 0;
+	}
 
-	//			}
-	//		}
-	//		currentCode = "0" + symbolCoded;
-	//	}
-	//	if (currentCommandType == L_Command)
-	//	{
-	//	}
-	//	if (currentCommandType == C_Command)
-	//	{
-	//		parsedDest = AsmParser.dest();
-	//		parsedComp = AsmParser.comp();
-	//		parsedJump = AsmParser.jump();
-	//		//cout << "Dest is: " << parsedDest << endl;
-	//		//cout << "Comp is: " << parsedComp << endl;
-	//		//cout << "Jump is: " << parsedJump << endl;
-	//		codeDest = Code.dest(parsedDest);
-	//		codeComp = Code.comp(parsedComp);
-	//		codeJump = Code.jump(parsedJump);
-	//		if ((codeDest == "Invalid") || (codeComp == "Invalid") || (codeJump == "Invalid"))
-	//		{
-	//			cout << "Error, invalid entry!" << endl;
-	//			return 1;
-	//		}
-	//		else {
-	//			currentCode = "111" + codeComp + codeDest + codeJump;
-	//		}
-	//	}
-	//	// cout << "Current command code = " << currentCode << endl;
-	//	if (currentCode != "") { codeList.push_back(currentCode); }
+	
+	CodeWriter CodeWriter(inputFileName);
+	
+	for (int i = 0; i < fileList.size(); i++) {
+		Parser VMParser(fileList[i]);
+		CodeWriter.staticVariable = fileList[i];
+		CodeWriter.staticVariable = CodeWriter.staticVariable.substr(0, CodeWriter.staticVariable.find("."));
+		while (VMParser.hasMoreCommands())
+		{
+			//	currentCode = "";
+			VMParser.advance();
+			commandType currentCommandType = VMParser.commandType();
+			if (currentCommandType != C_NULL)
+			{
+				if (currentCommandType == C_ARITHMETIC)
+				{
+					CodeWriter.writeArithmetic(VMParser.currentCommand);
+				}
+				else if (currentCommandType == C_RETURN) {}
+				else VMParser.arg1();
+				if ((currentCommandType == C_PUSH) || (currentCommandType == C_POP) || (currentCommandType == C_FUNCTION) || (currentCommandType == C_CALL))
+				{
+					VMParser.arg2();
+				}
+				else {}
 
-	//}
-	//AsmParser.reset();
+				if ((currentCommandType == C_PUSH) || (currentCommandType == C_POP))
+				{
+					CodeWriter.writePushPop(currentCommandType, VMParser.argument1, VMParser.argument2);
+				}
 
+				else {}
 
-	//for (unsigned int i = 0; i < codeList.size(); i++)
-	//	outputFileStream << codeList[i] << endl;
+			}
+		}
+	}
 	CodeWriter.Close();
 
 	return 0;
+}
+
+void DumpEntry(_finddata_t &data)
+{
+	//string createtime(ctime(&data.time_create));
+	//cout << Chop(createtime) << "t";
+	cout << data.size << "t";
+	if ((data.attrib & _A_SUBDIR) == _A_SUBDIR)
+	{
+		cout << "[" << data.name << "]" << endl;
+	}
+	else
+	{
+		cout << data.name << endl;
+	}
 }
