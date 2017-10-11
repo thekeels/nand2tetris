@@ -155,6 +155,7 @@ public:
 		filename = (filename.substr(0, filename.find("."))); // remove .vm if it is there
 		outputFileName = directory + filename + ".asm";
 		setFileName(outputFileName);
+		// writeBootstrapper();
 		staticVariable = (filename.substr(0, filename.find(".")));
 	}
 	void setFileName(string outputFileName)
@@ -167,6 +168,12 @@ public:
 		outputFileStream.close();
 		return;
 	}
+	//void writeBootstrapper()
+	//{
+	//	outputFileStream << "@256\nD=A\n@SP\nM=D\n(Sys.Init)" << endl;
+	//	writeCall("Sys.Init", 0);
+	//	return;
+	//}
 	void writeArithmetic(string command)
 	{
 		if ((command == "add") || (command == "ADD"))
@@ -312,7 +319,7 @@ public:
 	void writeCall(string functionName, int numArgs)
 	{
 		outputFileStream << "@returnAddress_" << functionCounter << endl;
-		outputFileStream << "\nD=A\n@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D\n@LCL\nD=M\n" << endl;
+		outputFileStream << "\nD=A" << endl;
 		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH RETURN ADDRESS
 		outputFileStream << "@LCL\nD=M" << endl;
 		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl;  // PUSH LCL
@@ -327,6 +334,7 @@ public:
 		outputFileStream << "@" << functionName << endl;
 		outputFileStream << "0;JMP" << endl;
 		outputFileStream << "(returnAddress_" << functionCounter << ")" << endl;
+		functionCounter++;
 		// push return address  --> using the label declared below
 		// push LCL			--> save LCL of the calling function
 		// push ARG			--> save ARG of the calling function
@@ -347,7 +355,7 @@ public:
 		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@THIS\nM=D" << endl; // restore THIS
 		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@ARG\nM=D" << endl; // restore ARG
 		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@LCL\nM=D" << endl; // restore LCL
-		outputFileStream << "@R14\nA=M-1\nD=M\nA=D\n0;JMP" << endl; // restore retADDR and jump
+		outputFileStream << "@R15\nA=M\n0;JMP" << endl; // restore retADDR and jump
 			// frame = LCL				// frame is a temp. variable
 			// retAddr = *(frame - 5)	// retAddr is a temp. variable
 			// *ARG = pop				// repositions the return value for the caller
@@ -361,7 +369,7 @@ public:
 	}
 	void writeFunction(string functionName, int numLocals)
 	{
-		outputFileStream << "(" << staticVariable << ")" << endl;
+		outputFileStream << "(" << functionName << ")" << endl;
 		//	repeat nVars times:
 		//	push 0
 		for (int i = 0; i < numLocals; i++)
