@@ -64,6 +64,14 @@ public:
 		{
 			getline(inputFileStream, currentCommand);
 			currentCommand = currentCommand.substr(0, currentCommand.find("//"));
+			size_t lastCharacter = currentCommand.find_last_not_of(" \t\r\n");
+			size_t firstCharacter = currentCommand.find_first_not_of(" \t\r\n");
+			
+			if (string::npos != firstCharacter) {
+				// currentCommand.substr(firstCharacter, lastCharacter - firstCharacter);
+				size_t range = lastCharacter - firstCharacter + 1;
+				currentCommand = currentCommand.substr(firstCharacter,range);
+			}
 			istringstream iss(currentCommand);
 			tokens = { istream_iterator<string>{iss},istream_iterator<string>{} };
 
@@ -72,6 +80,7 @@ public:
 			cout << "Reached end of file.." << endl;
 		return;
 	}
+
 
 		commandType commandType()
 		{
@@ -155,7 +164,7 @@ public:
 		filename = (filename.substr(0, filename.find("."))); // remove .vm if it is there
 		outputFileName = directory + filename + ".asm";
 		setFileName(outputFileName);
-		// writeBootstrapper();
+		writeBootstrapper();
 		staticVariable = (filename.substr(0, filename.find(".")));
 	}
 	void setFileName(string outputFileName)
@@ -168,12 +177,12 @@ public:
 		outputFileStream.close();
 		return;
 	}
-	//void writeBootstrapper()
-	//{
-	//	outputFileStream << "@256\nD=A\n@SP\nM=D\n(Sys.Init)" << endl;
-	//	writeCall("Sys.Init", 0);
-	//	return;
-	//}
+	void writeBootstrapper()
+	{
+		outputFileStream << "@256\nD=A\n@SP\nM=D\n" << endl;
+		writeCall("Sys.init", 0);
+		return;
+	}
 	void writeArithmetic(string command)
 	{
 		if ((command == "add") || (command == "ADD"))
