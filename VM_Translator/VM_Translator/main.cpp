@@ -144,7 +144,7 @@ class CodeWriter
 	int jeqCounter = 0;
 	int jleCounter = 0;
 	int jgeCounter = 0;
-	
+	int functionCounter = 0;
 //	vector<string> symbolNameArray; // declaration
 //	vector<int> symbolAddressArray; // declaration
 //
@@ -289,6 +289,55 @@ public:
 		else {}
 		return;
 	}
+
+	void writeLabel(string label)
+	{
+		outputFileStream << "(" << staticVariable << "$" << label << ")" << endl;
+		return;
+	}
+	void writeGoto(string label)
+	{
+		outputFileStream << "@" << staticVariable << "$" << label << "\n0;JMP" << endl;
+		return;
+	}
+	void writeIf(string label)
+	{
+		outputFileStream << "@SP\nM=M-1\nA=M\nD=M\n@" << staticVariable << "$" << label << "\nD;JNE" << endl;
+		return;
+	}
+	void writeCall(string functionName, int numArgs)
+	{
+		outputFileStream << "(returnAddress_" << functionCounter << ")" << endl;
+		// push return address  --> using the label declared below
+		// push LCL			--> save LCL of the calling function
+		// push ARG			--> save ARG of the calling function
+		// push THIS		--> save THIS of the calling function
+		// push THAT		--> save THAT of the calling function
+		// ARG = SP-n-5		--> reposition ARG (n=number of args)
+		// LCL = SP			--> reposition LCL
+		// goto f			--> transfer control
+		// (return-address) --> declare a label for return address
+		return;
+	}
+	void writeReturn(void)
+	{
+			// frame = LCL				// frame is a temp. variable
+			// retAddr = *(frame - 5)	// retAddr is a temp. variable
+			// *ARG = pop				// repositions the return value for the caller
+			// SP = ARG + 1				// restores the caller’s SP
+			// THAT = *(frame - 1)		// restores the caller’s THAT
+			// THIS = *(frame - 2)		// restores the caller’s THIS
+			// ARG = *(frame - 3)		// restores the caller’s ARG
+			// LCL = *(frame - 4)		// restores the caller’s LCL
+			// goto retAddr				// goto returnAddress
+		return;
+	}
+	void writeFunction(string functionName, int numLocals)
+	{
+		//	repeat nVars times:
+		//	push 0
+		return;
+	}
 	~CodeWriter()
 	{	}
 };
@@ -308,8 +357,8 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	//int symbolCounter = 16;
 
 	string filename(argv[1]);
-	string inputFileName, inputDirectory;
-
+	string inputFileName, asmFileName;
+	string fileLocation;
 	vector<string> fileList;
 	_finddata_t data;
 	size_t last_slash_idx = filename.find_last_of("\\/");
@@ -329,14 +378,20 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	else
 	{
 		// Fancy code from http://www.dummies.com/programming/cpp/how-to-get-the-contents-of-a-directory-in-c/ to find files in a directory
-		if (filename.back() = '\\')
+		if (filename.back() == '\\')
 		{
 			const size_t backslashIndex = filename.rfind('\\');
+			fileLocation = filename;
 			filename.erase(backslashIndex);
 			last_slash_idx = filename.find_last_of("\\/");
 		}
-		inputDirectory = filename.substr(last_slash_idx+1);
-		inputFileName = inputDirectory;
+		else
+		{
+			fileLocation = filename + "\\";
+		}
+		
+		asmFileName = filename.substr(last_slash_idx+1);
+		inputFileName = asmFileName;
 		filename = filename + "\\*.vm";
 		intptr_t ff = _findfirst(filename.c_str(), &data);
 		if (ff != -1)
@@ -360,11 +415,11 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		return 0;
 	}
 
-	
-	CodeWriter CodeWriter(inputFileName);
-	
+	CodeWriter CodeWriter(asmFileName);
+	string fileNameCurrent;
 	for (int i = 0; i < fileList.size(); i++) {
-		Parser VMParser(fileList[i]);
+		fileNameCurrent = fileLocation + fileList[i];
+		Parser VMParser(fileNameCurrent);
 		CodeWriter.staticVariable = fileList[i];
 		CodeWriter.staticVariable = CodeWriter.staticVariable.substr(0, CodeWriter.staticVariable.find("."));
 		while (VMParser.hasMoreCommands())
@@ -383,6 +438,26 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 				if ((currentCommandType == C_PUSH) || (currentCommandType == C_POP) || (currentCommandType == C_FUNCTION) || (currentCommandType == C_CALL))
 				{
 					VMParser.arg2();
+				}
+				else if (currentCommandType == C_LABEL)
+				{
+					CodeWriter.writeLabel(VMParser.argument1);
+				}
+				else if (currentCommandType == C_GOTO)
+				{
+					CodeWriter.writeGoto(VMParser.argument1);
+				}
+				else if (currentCommandType == C_IF)
+				{
+					CodeWriter.writeIf(VMParser.argument1);
+				}
+				else if (currentCommandType == C_CALL)
+				{
+					CodeWriter.writeCall(VMParser.argument1,VMParser.argument2);
+				}
+				else if (currentCommandType == C_FUNCTION)
+				{
+					CodeWriter.writeFunction(VMParser.argument1, VMParser.argument2);
 				}
 				else {}
 
