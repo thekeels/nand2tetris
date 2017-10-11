@@ -150,9 +150,10 @@ class CodeWriter
 //
 public:
 	string staticVariable;
-	CodeWriter(string filename) 
+	CodeWriter(string directory,string filename) 
 	{
-		outputFileName = (filename.substr(0, filename.find("."))) + ".asm";
+		filename = (filename.substr(0, filename.find("."))); // remove .vm if it is there
+		outputFileName = directory + filename + ".asm";
 		setFileName(outputFileName);
 		staticVariable = (filename.substr(0, filename.find(".")));
 	}
@@ -433,7 +434,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 			int res = 0;
 			while (res != -1)
 			{
-				DumpEntry(data);
+				//DumpEntry(data);
 				//string temp = data.name;
 				//temp = temp.substr(0, temp.find(".vm"));
 				fileList.push_back(data.name);
@@ -449,7 +450,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		return 0;
 	}
 
-	CodeWriter CodeWriter(asmFileName);
+	CodeWriter CodeWriter(fileLocation,asmFileName);
 	string fileNameCurrent;
 	for (int i = 0; i < fileList.size(); i++) {
 		fileNameCurrent = fileLocation + fileList[i];
