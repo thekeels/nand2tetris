@@ -154,7 +154,7 @@ public:
 	{
 		outputFileName = (filename.substr(0, filename.find("."))) + ".asm";
 		setFileName(outputFileName);
-		staticVariable = filename;
+		staticVariable = (filename.substr(0, filename.find(".")));
 	}
 	void setFileName(string outputFileName)
 	{
@@ -171,12 +171,14 @@ public:
 		if ((command == "add") || (command == "ADD"))
 		{
 			// ASSEMBLY code to ADD
-			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M+D" << endl;
+			//outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M+D" << endl;
+			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M+D\n" << endl;
 		}
 		else if ((command == "sub") || (command == "SUB"))
 		{
 			// ASSEMBLY code to SUB
-			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M-D" << endl;
+			//outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M-D" << endl;
+			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M-D\n" << endl;
 		}
 		else if ((command == "EQ") || (command == "eq"))
 		{
@@ -279,7 +281,8 @@ public:
 		{
 			// ASSEMBLY code to PUSH
 
-			outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl;
+			//outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl;
+			outputFileStream << "@SP\nA=M\nM=D\n@SP\nM=M+1" << endl;
 		}
 		else if (pushOrPop == C_POP)
 		{
@@ -337,13 +340,13 @@ public:
 	}
 	void writeReturn(void)
 	{
-		outputFileStream << "@LCL\nD=M\n@R14\nDM=D\n@5\nAD=D-A\nD=M\n@R15\nM=D" << endl;
+		outputFileStream << "@LCL\nD=M\n@R14\nM=D\n@5\nAD=D-A\nD=M\n@R15\nM=D" << endl;
 		outputFileStream << "@SP\nM=M-1\nA=M\nD=M\n@ARG\nA=M\nM=D\n@ARG\nD=M\n@SP\nM=D+1" << endl;
 		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@THAT\nM=D" << endl; // restore THAT
 		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@THIS\nM=D" << endl; // restore THIS
 		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@ARG\nM=D" << endl; // restore ARG
 		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@LCL\nM=D" << endl; // restore LCL
-		outputFileStream << "@R14\nD=M\n0;JMP" << endl;
+		outputFileStream << "@R14\nA=M-1\nD=M\nA=D\n0;JMP" << endl; // restore retADDR and jump
 			// frame = LCL				// frame is a temp. variable
 			// retAddr = *(frame - 5)	// retAddr is a temp. variable
 			// *ARG = pop				// repositions the return value for the caller
@@ -357,11 +360,12 @@ public:
 	}
 	void writeFunction(string functionName, int numLocals)
 	{
+		outputFileStream << "(" << staticVariable << ")" << endl;
 		//	repeat nVars times:
 		//	push 0
 		for (int i = 0; i < numLocals; i++)
 		{
-			outputFileStream << "@0"<< endl;
+			outputFileStream << "@0\nD=A"<< endl;
 			outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH 0
 		}
 		return;
@@ -392,16 +396,18 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	size_t last_slash_idx = filename.find_last_of("\\/");
 	//size_t fileStartPos = filename.find_last_of("/\\");
 	// CODE to check -- is input a directory or single .vm file?
-	if (filename.find(".vm")!=string::npos)
+	if (filename.find(".vm") != string::npos)
 	{
-
+		const size_t backslashIndex = filename.rfind('\\');
+		fileLocation = filename;
+		fileLocation.erase(backslashIndex+1);
 		bool directoryCheck = false;
 		filename.erase(0, last_slash_idx + 1);
 		//const size_t period_idx = filename.rfind('.'); // Remove extension if present.
 		//filename.erase(period_idx);
 		//inputFileName = (filename.substr(last_slash_idx+1, filename.find(".vm")));
 		fileList.push_back(filename);
-		inputFileName = filename;
+		asmFileName = filename;
 	}
 	else
 	{
@@ -461,13 +467,19 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 				{
 					CodeWriter.writeArithmetic(VMParser.currentCommand);
 				}
-				else if (currentCommandType == C_RETURN) {}
-				else VMParser.arg1();
+				else if (currentCommandType == C_RETURN) 
+				{
+					CodeWriter.writeReturn();
+				}
+				else
+				{
+					VMParser.arg1();
+				}
 				if ((currentCommandType == C_PUSH) || (currentCommandType == C_POP) || (currentCommandType == C_FUNCTION) || (currentCommandType == C_CALL))
 				{
 					VMParser.arg2();
 				}
-				else if (currentCommandType == C_LABEL)
+				if (currentCommandType == C_LABEL)
 				{
 					CodeWriter.writeLabel(VMParser.argument1);
 				}
