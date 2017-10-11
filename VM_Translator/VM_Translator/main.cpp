@@ -179,7 +179,9 @@ public:
 	}
 	void writeBootstrapper()
 	{
-		outputFileStream << "@256\nD=A\n@SP\nM=D\n" << endl;
+		outputFileStream << "// Initializing boot strapper" << endl;
+		outputFileStream << "@256\nD=A\n@SP\nM=D" << endl;
+		outputFileStream << "// Calling Sys.init" << endl;
 		writeCall("Sys.init", 0);
 		return;
 	}
@@ -328,7 +330,7 @@ public:
 	void writeCall(string functionName, int numArgs)
 	{
 		outputFileStream << "@returnAddress_" << functionCounter << endl;
-		outputFileStream << "\nD=A" << endl;
+		outputFileStream << "D=A" << endl;
 		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH RETURN ADDRESS
 		outputFileStream << "@LCL\nD=M" << endl;
 		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl;  // PUSH LCL
