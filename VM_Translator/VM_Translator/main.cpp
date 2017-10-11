@@ -307,6 +307,21 @@ public:
 	}
 	void writeCall(string functionName, int numArgs)
 	{
+		outputFileStream << "@returnAddress_" << functionCounter << endl;
+		outputFileStream << "\nD=A\n@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D\n@LCL\nD=M\n" << endl;
+		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH RETURN ADDRESS
+		outputFileStream << "@LCL\nD=M" << endl;
+		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl;  // PUSH LCL
+		outputFileStream << "@ARG\nD=M" << endl;
+		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH ARG
+		outputFileStream << "@THIS\nD=M" << endl;
+		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH THIS
+		outputFileStream << "@THAT\nD=M" << endl;
+		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH THAT
+		outputFileStream << "@" << numArgs << endl;
+		outputFileStream << "D=A\n@5\nD=D+A\n@SP\nD=M-D\n@ARG\nM=D\n@SP\nD=M\n@LCL\nM=D" << endl;
+		outputFileStream << "@" << functionName << endl;
+		outputFileStream << "0;JMP" << endl;
 		outputFileStream << "(returnAddress_" << functionCounter << ")" << endl;
 		// push return address  --> using the label declared below
 		// push LCL			--> save LCL of the calling function
@@ -317,10 +332,18 @@ public:
 		// LCL = SP			--> reposition LCL
 		// goto f			--> transfer control
 		// (return-address) --> declare a label for return address
+		
 		return;
 	}
 	void writeReturn(void)
 	{
+		outputFileStream << "@LCL\nD=M\n@R14\nDM=D\n@5\nAD=D-A\nD=M\n@R15\nM=D" << endl;
+		outputFileStream << "@SP\nM=M-1\nA=M\nD=M\n@ARG\nA=M\nM=D\n@ARG\nD=M\n@SP\nM=D+1" << endl;
+		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@THAT\nM=D" << endl; // restore THAT
+		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@THIS\nM=D" << endl; // restore THIS
+		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@ARG\nM=D" << endl; // restore ARG
+		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@LCL\nM=D" << endl; // restore LCL
+		outputFileStream << "@R14\nD=M\n0;JMP" << endl;
 			// frame = LCL				// frame is a temp. variable
 			// retAddr = *(frame - 5)	// retAddr is a temp. variable
 			// *ARG = pop				// repositions the return value for the caller
@@ -336,6 +359,11 @@ public:
 	{
 		//	repeat nVars times:
 		//	push 0
+		for (int i = 0; i < numLocals; i++)
+		{
+			outputFileStream << "@0"<< endl;
+			outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH 0
+		}
 		return;
 	}
 	~CodeWriter()
