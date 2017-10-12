@@ -1,0 +1,18 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/09/Square/Main.jack
+
+// Based on the Square Dance game
+// Creates a cannon game and starts running it
+
+/** Initializes a new Cannon game and starts running it. */
+class Main {
+    function void main() {
+        var CannonGame game;
+        let game = CannonGame.new();
+        do game.run();
+        do game.dispose();
+        return;
+    }
+}
