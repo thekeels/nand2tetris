@@ -99,6 +99,7 @@ public:
 				size_t range = lastCharacter - firstCharacter + 1;
 				currentCommand = currentCommand.substr(firstCharacter, range);
 			}
+			else return;
 			//size_t keywordPosition = currentCommand.find_first_of(" ");
 			//token = currentCommand.substr(firstCharacter, keywordPosition - 1);
 			istringstream iss(currentCommand);
@@ -186,7 +187,7 @@ public:
 
 
 };
-class CodeWriter
+class CompilationEngine
 {
 	int localBase = 1;
 	int argumentBase = 2;
@@ -202,14 +203,13 @@ class CodeWriter
 	//	vector<int> symbolAddressArray; // declaration
 	//
 public:
-	string staticVariable;
-	CodeWriter(string directory, string filename)
+
+	CompilationEngine(string directory, string filename)
 	{
 		filename = (filename.substr(0, filename.find("."))); // remove .jack if it is there
-		outputFileName = directory + filename + ".vm";
+		outputFileName = directory + filename + ".xml";
 		setFileName(outputFileName);
-		writeBootstrapper();
-		staticVariable = (filename.substr(0, filename.find(".")));
+		// writeBootstrapper();
 	}
 	void setFileName(string outputFileName)
 	{
@@ -221,220 +221,15 @@ public:
 		outputFileStream.close();
 		return;
 	}
-	void writeBootstrapper()
+	void CompileClass()
 	{
 		outputFileStream << "// Initializing boot strapper" << endl;
 		outputFileStream << "@256\nD=A\n@SP\nM=D" << endl;
 		outputFileStream << "// Calling Sys.init" << endl;
-		writeCall("Sys.init", 0);
-		return;
-	}
-	void writeArithmetic(string command)
-	{
-		if ((command == "add") || (command == "ADD"))
-		{
-			// ASSEMBLY code to ADD
-			//outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M+D" << endl;
-			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M+D\n" << endl;
-		}
-		else if ((command == "sub") || (command == "SUB"))
-		{
-			// ASSEMBLY code to SUB
-			//outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M-D" << endl;
-			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M-D\n" << endl;
-		}
-		else if ((command == "EQ") || (command == "eq"))
-		{
-			// ASSEMBLY code to EQ
-			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@Jeq" << jeqCounter << "\nD;JEQ" << endl;
-			outputFileStream << "\n@SP\nA=M-1\nM=0\n(Jeq" << jeqCounter << ")" << endl;
-			jeqCounter++;
-		}
-		else if ((command == "GT") || (command == "gt"))
-		{
-			// ASSEMBLY code to GT
-			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@Jgt" << jgeCounter << "\nD;JGT" << endl;
-			outputFileStream << "\n@SP\nA=M-1\nM=0\n(Jgt" << jgeCounter << ")" << endl;
-			jgeCounter++;
-		}
-		else if ((command == "LT") || (command == "lt"))
-		{
-			// ASSEMBLY code to LT
-			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nD=M-D\nM=-1\n@Jlt" << jleCounter << "\nD;JLT" << endl;
-			outputFileStream << "\n@SP\nA=M-1\nM=0\n(Jlt" << jleCounter << ")" << endl;
-			jleCounter++;
-		}
-		else if ((command == "AND") || (command == "and"))
-		{
-			// ASSEMBLY code to and
-			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M&D" << endl;
-		}
-		else if ((command == "OR") || (command == "or"))
-		{
-			// ASSEMBLY code to OR
-			outputFileStream << "@SP\nAM=M-1\nD=M\nA=A-1\nM=M|D" << endl;
-		}
-		else if ((command == "NEG") || (command == "neg"))
-		{
-			// ASSEMBLY code to NEG
-			outputFileStream << "@SP\nA=M-1\nM=-M" << endl;
-		}
-		else if ((command == "NOT") || (command == "not"))
-		{
-			// ASSEMBLY code to not
-			outputFileStream << "@SP\nA=M-1\nM=!M" << endl;
-		}
-		else {}
-		return;
-	}
-	void writePushPop(tokenType pushOrPop, string segment, int index)
-	{
-		string segmentTranslated;
-		int segmentBaseAddress = 0;
-		int segmentAddress;
-
-		// static, this, local, argument, that, constant, pointer, or temp
-		if (segment == "static")
-		{
-			outputFileStream << "@" << staticVariable << "." << index << endl;
-			outputFileStream << "D=A\n@R13\nM=D\nA=M\nD=M" << endl;
-		}
-		else if (segment == "this")
-		{
-			outputFileStream << "@THIS\nD=M\n@" << index << endl;
-			outputFileStream << "D=A+D\n@R13\nM=D\nA=M\nD=M" << endl;
-		}
-		else if (segment == "local")
-		{
-			outputFileStream << "@LCL\nD=M\n@" << index << endl;
-			outputFileStream << "D=A+D\n@R13\nM=D\nA=M\nD=M" << endl;
-		}
-		else if (segment == "argument")
-		{
-			outputFileStream << "@ARG\nD=M\n@" << index << endl;
-			outputFileStream << "D=A+D\n@R13\nM=D\nA=M\nD=M" << endl;
-		}
-		else if (segment == "that")
-		{
-			outputFileStream << "@THAT\nD=M\n@" << index << endl;
-			outputFileStream << "D=A+D\n@R13\nM=D\nA=M\nD=M" << endl;
-		}
-		else if (segment == "constant")
-		{
-			segmentAddress = index;
-			outputFileStream << "@" << segmentAddress << endl;
-			outputFileStream << "D=A\n";
-		}
-		else if (segment == "pointer")
-		{
-			outputFileStream << "@3\nD=A\n@" << index << endl;
-			outputFileStream << "D=A+D\n@R13\nM=D\nA=M\nD=M" << endl;
-		}
-		else if (segment == "temp")
-		{
-			outputFileStream << "@5\nD=A\n@" << index << endl;
-			outputFileStream << "D=A+D\n@R13\nM=D\nA=M\nD=M" << endl;
-		}
-		else
-		{
-			// segmentBaseAddress = 256;
-		}
-		segmentAddress = segmentBaseAddress + index;
-		if (pushOrPop == KEYWORD)
-		{
-			// ASSEMBLY code to PUSH
-
-			//outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl;
-			outputFileStream << "@SP\nA=M\nM=D\n@SP\nM=M+1" << endl;
-		}
-		else if (pushOrPop == SYMBOL)
-		{
-			// ASSEMBLY code to POP
-			outputFileStream << "@SP\nM=M-1\nA=M\nD=M\n@R13\nA=M\nM=D" << endl;
-		}
-		else {}
 		return;
 	}
 
-	void writeLabel(string label)
-	{
-		outputFileStream << "(" << staticVariable << "$" << label << ")" << endl;
-		return;
-	}
-	void writeGoto(string label)
-	{
-		outputFileStream << "@" << staticVariable << "$" << label << "\n0;JMP" << endl;
-		return;
-	}
-	void writeIf(string label)
-	{
-		outputFileStream << "@SP\nM=M-1\nA=M\nD=M\n@" << staticVariable << "$" << label << "\nD;JNE" << endl;
-		return;
-	}
-	void writeCall(string functionName, int numArgs)
-	{
-		outputFileStream << "@returnAddress_" << functionCounter << endl;
-		outputFileStream << "D=A" << endl;
-		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH RETURN ADDRESS
-		outputFileStream << "@LCL\nD=M" << endl;
-		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl;  // PUSH LCL
-		outputFileStream << "@ARG\nD=M" << endl;
-		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH ARG
-		outputFileStream << "@THIS\nD=M" << endl;
-		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH THIS
-		outputFileStream << "@THAT\nD=M" << endl;
-		outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH THAT
-		outputFileStream << "@" << numArgs << endl;
-		outputFileStream << "D=A\n@5\nD=D+A\n@SP\nD=M-D\n@ARG\nM=D\n@SP\nD=M\n@LCL\nM=D" << endl;
-		outputFileStream << "@" << functionName << endl;
-		outputFileStream << "0;JMP" << endl;
-		outputFileStream << "(returnAddress_" << functionCounter << ")" << endl;
-		functionCounter++;
-		// push return address  --> using the label declared below
-		// push LCL			--> save LCL of the calling function
-		// push ARG			--> save ARG of the calling function
-		// push THIS		--> save THIS of the calling function
-		// push THAT		--> save THAT of the calling function
-		// ARG = SP-n-5		--> reposition ARG (n=number of args)
-		// LCL = SP			--> reposition LCL
-		// goto f			--> transfer control
-		// (return-address) --> declare a label for return address
-
-		return;
-	}
-	void writeReturn(void)
-	{
-		outputFileStream << "@LCL\nD=M\n@R14\nM=D\n@5\nAD=D-A\nD=M\n@R15\nM=D" << endl;
-		outputFileStream << "@SP\nM=M-1\nA=M\nD=M\n@ARG\nA=M\nM=D\n@ARG\nD=M\n@SP\nM=D+1" << endl;
-		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@THAT\nM=D" << endl; // restore THAT
-		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@THIS\nM=D" << endl; // restore THIS
-		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@ARG\nM=D" << endl; // restore ARG
-		outputFileStream << "@R14\nM=M-1\nA=M\nD=M\n@LCL\nM=D" << endl; // restore LCL
-		outputFileStream << "@R15\nA=M\n0;JMP" << endl; // restore retADDR and jump
-														// frame = LCL				// frame is a temp. variable
-														// retAddr = *(frame - 5)	// retAddr is a temp. variable
-														// *ARG = pop				// repositions the return value for the caller
-														// SP = ARG + 1				// restores the caller’s SP
-														// THAT = *(frame - 1)		// restores the caller’s THAT
-														// THIS = *(frame - 2)		// restores the caller’s THIS
-														// ARG = *(frame - 3)		// restores the caller’s ARG
-														// LCL = *(frame - 4)		// restores the caller’s LCL
-														// goto retAddr				// goto returnAddress
-		return;
-	}
-	void writeFunction(string functionName, int numLocals)
-	{
-		outputFileStream << "(" << functionName << ")" << endl;
-		//	repeat nVars times:
-		//	push 0
-		for (int i = 0; i < numLocals; i++)
-		{
-			outputFileStream << "@0\nD=A" << endl;
-			outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl; // PUSH 0
-		}
-		return;
-	}
-	~CodeWriter()
+	~CompilationEngine()
 	{	}
 };
 
@@ -450,7 +245,7 @@ public:
 	TokenWriter(string directory, string filename)
 	{
 		filename = (filename.substr(0, filename.find("."))); // remove .jack if it is there
-		outputFileNameT = directory + filename + ".xml";
+		outputFileNameT = directory + filename + "T.xml";
 		setFileName(outputFileNameT);
 		writeHeader();
 		staticVariable = (filename.substr(0, filename.find(".")));
@@ -530,6 +325,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	string inputFileName, asmFileName;
 	string fileLocation;
 	vector<string> fileList;
+	vector<tokenType> tokenList;
 	_finddata_t data;
 	size_t last_slash_idx = filename.find_last_of("\\/");
 	//size_t fileStartPos = filename.find_last_of("/\\");
@@ -587,14 +383,14 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		return 0;
 	}
 
-	CodeWriter CodeWriter(fileLocation, asmFileName);
-	TokenWriter TokenWriter(fileLocation, asmFileName);
+	
+//	TokenWriter TokenWriter(fileLocation, asmFileName);
 	string fileNameCurrent;
 	for (int i = 0; i < fileList.size(); i++) {
 		fileNameCurrent = fileLocation + fileList[i];
+		TokenWriter TokenWriter(fileLocation, fileList[i]);
+		CompilationEngine CompilationEngine(fileLocation, fileList[i]);
 		JackTokenizer JackTokenizer(fileNameCurrent);
-		CodeWriter.staticVariable = fileList[i];
-		CodeWriter.staticVariable = CodeWriter.staticVariable.substr(0, CodeWriter.staticVariable.find("."));
 		while (JackTokenizer.hasMoreCommands())
 		{
 			//	currentCode = "";
@@ -609,31 +405,40 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 				if (currentTokenType == KEYWORD)
 				{
 					TokenWriter.writeKeyword(JackTokenizer.tokenString[j]);
+					tokenList.push_back(currentTokenType);
 				}
 				else if (currentTokenType == SYMBOL)
 				{
 					TokenWriter.writeSymbol(JackTokenizer.tokenString[j]);
+					tokenList.push_back(currentTokenType);
 				}
 				else if (currentTokenType == IDENTIFIER)
 				{
 					TokenWriter.writeIdentifier(JackTokenizer.tokenString[j]);
+					tokenList.push_back(currentTokenType);
 				}
 				else if (currentTokenType == STRING_CONST)
 				{
 					TokenWriter.writeStringConst(JackTokenizer.tokenString[j]);
+					tokenList.push_back(currentTokenType);
 				}
 				else if (currentTokenType == INT_CONST)
 				{
 					TokenWriter.writeIntConst(JackTokenizer.tokenString[j]);
+					tokenList.push_back(currentTokenType);
 				}
 				else;
 			}
+			
 
 		}
+		TokenWriter.writeFooter();
+		TokenWriter.Close();
+		CompilationEngine.CompileClass();
+		CompilationEngine.Close();
 	}
-	CodeWriter.Close();
-	TokenWriter.writeFooter();
-	TokenWriter.Close();
+
+
 	return 0;
 }
 
