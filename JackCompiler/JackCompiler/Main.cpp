@@ -10,28 +10,29 @@
 #include <io.h>
 using namespace std;
 
-enum commandType { C_ARITHMETIC, C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF, C_FUNCTION, C_RETURN, C_CALL, C_ERROR, C_NULL };
-// 0 = C_ARITHMETIC, 1 = C_PUSH, 2 = C_POP, 3 = C_LABEL, 4 = C_GOTO, 5 = C_IF, 6 = C_FUNCTION, 7 = C_RETURN, 8 = C_CALL 9 = C_ERROR, 10 = C_NULL
+enum tokenType { KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST, TOKEN_NULL, TOKEN_ERROR};
+// 0 = KEYWORD, 1= SYMBOL, 2 = IDENTIFIER, 3 = INT_CONST, 4 = STRING_CONST
 
-class Parser
+class JackTokenizer
 {
 
 	string inputFileName;
 	ifstream inputFileStream;
 	size_t firstCharacter;
-	vector<string> tokens;
-
+	vector<char> tokens;
+	vector<string> tokenString;
 	//	size_t lastCharacter;
 
 public:
 	string argument1;// arg2;
 	int argument2, argument3;
 	string currentCommand;
+	string token;
 	//	string destField, compField, jumpField;
-	Parser() {}
-	Parser(string filename) : inputFileName(filename)
+	JackTokenizer() {}
+	JackTokenizer(string filename) : inputFileName(filename)
 	{
-		cout << "Instantiating Parser..." << endl;
+		cout << "Instantiating Tokenizer..." << endl;
 		cout << "Opening " << filename << " for parsing..." << endl;
 		inputFileStream.open(inputFileName);
 		if (inputFileStream.good())
@@ -41,9 +42,9 @@ public:
 		else
 			cout << "Unable to open file" << endl;
 	}
-	~Parser()
+	~JackTokenizer()
 	{
-		cout << "Destroying Parser" << endl;
+		cout << "Destroying Tokenizer" << endl;
 		inputFileStream.close();
 	}
 
@@ -62,6 +63,7 @@ public:
 		{
 			getline(inputFileStream, currentCommand);
 			currentCommand = currentCommand.substr(0, currentCommand.find("//"));
+			currentCommand = currentCommand.substr(0, currentCommand.find("/*"));
 			size_t lastCharacter = currentCommand.find_last_not_of(" \t\r\n");
 			size_t firstCharacter = currentCommand.find_first_not_of(" \t\r\n");
 
@@ -70,8 +72,55 @@ public:
 				size_t range = lastCharacter - firstCharacter + 1;
 				currentCommand = currentCommand.substr(firstCharacter, range);
 			}
+			//size_t keywordPosition = currentCommand.find_first_of(" ");
+			//token = currentCommand.substr(firstCharacter, keywordPosition - 1);
 			istringstream iss(currentCommand);
-			tokens = { istream_iterator<string>{iss},istream_iterator<string>{} };
+			istreambuf_iterator<char>eos;
+			istreambuf_iterator<char>itt(iss);
+			string test;
+			//istream_iterator<string> eos;
+			//istream_iterator<string> itt(iss);
+			while (itt != eos)
+			{ 
+				while ((*itt != ' ') && (*itt != '{') && (*itt != '(') && (*itt != '=') && (*itt != '}') && (*itt != ')') && (*itt != ';') && (*itt != ',') && (*itt != '[') && (*itt != ']') && (*itt != '-') && (*itt != '+') && (*itt != '*') && (*itt != '|') && (*itt != '/') && (*itt != '.'))
+				{
+					if (*itt == '\"')
+					{
+						do {
+							tokens.push_back(*itt);
+							cout << *itt;
+							++itt;
+						} while (*itt != '\"');
+						tokens.push_back(*itt);
+						++itt;
+					}
+					else
+					{
+						tokens.push_back(*itt);
+						cout << *itt;
+						++itt;
+					}
+				}
+				test = string(tokens.data(), tokens.size());
+				if (test != "")
+				{
+					tokenString.push_back(test);
+				}
+				tokens.clear();
+				
+				tokens.push_back(*itt);
+				test = string(tokens.data(), tokens.size());
+				if ((test != "") && (test!=" "))
+				{
+					tokenString.push_back(test);
+				}
+				tokens.clear();
+				++itt;
+
+				
+			}
+			token = "TEST";
+			//tokens = { istream_iterator<string>{iss},istream_iterator<string>{} };
 
 		}
 		else
@@ -80,64 +129,39 @@ public:
 	}
 
 
-	commandType commandType()
+	tokenType commandType()
 	{
 		//firstCharacter = currentCommand.find_first_not_of(" \t\r\n");
-		if (tokens.empty())
+		if (token.empty())
 		{
-			return C_NULL;
+			return TOKEN_NULL;
 		}
 		else
 		{
-			if ((tokens[0] == "ADD") || (tokens[0] == "SUB") || (tokens[0] == "add") || (tokens[0] == "sub") || (tokens[0] == "EQ") || (tokens[0] == "eq") || (tokens[0] == "GT") || (tokens[0] == "gt") || (tokens[0] == "LT") || (tokens[0] == "lt") || (tokens[0] == "AND") || (tokens[0] == "and") || (tokens[0] == "NOT") || (tokens[0] == "not") || (tokens[0] == "OR") || (tokens[0] == "or") || (tokens[0] == "NEG") || (tokens[0] == "neg"))
+			if ((token == "CLASS") || (token == "METHOD") || (token == "FUNCTION") || (token == "CONSTRUCTOR") || (token == "INT") || (token == "BOOLEAN") || (token == "CHAR") || (token == "VOID") || (token == "VAR") || (token == "STATIC") || (token == "FIELD") || (token == "LET") || (token == "DO") || (token == "IF") || (token == "ELSE") || (token == "WHILE") || (token == "RETURN") || (token == "TRUE") || (token == "FALSE") || (token == "NULL") || (token == "THIS"))
 			{
-				return C_ARITHMETIC;
+				return KEYWORD;
 			}
-			else if ((tokens[0] == "PUSH") || (tokens[0] == "push"))
+			else if ((token == "PUSH") || (token == "push"))
 			{
-				return C_PUSH;
+				return SYMBOL;
 			}
-			else if ((tokens[0] == "POP") || (tokens[0] == "pop"))
+			else if ((token == "POP") || (token == "pop"))
 			{
-				return C_POP;
+				return IDENTIFIER;
 			}
-			else if ((tokens[0] == "LABEL") || (tokens[0] == "label"))
+			else if ((token == "LABEL") || (token == "label"))
 			{
-				return C_LABEL;
+				return INT_CONST;
 			}
-			else if ((tokens[0] == "GOTO") || (tokens[0] == "goto"))
+			else if ((token == "LABEL") || (token == "label"))
 			{
-				return C_GOTO;
+				return STRING_CONST;
 			}
-			else if ((tokens[0] == "IF-GOTO") || (tokens[0] == "if-goto"))
-			{
-				return C_IF;
-			}
-			else if ((tokens[0] == "FUNCTION") || (tokens[0] == "function"))
-			{
-				return C_FUNCTION;
-			}
-			else if ((tokens[0] == "RETURN") || (tokens[0] == "return"))
-			{
-				return C_RETURN;
-			}
-			else if ((tokens[0] == "CALL") || (tokens[0] == "call"))
-			{
-				return C_CALL;
-			}
-			else return C_ERROR;
+			else return TOKEN_ERROR;
 		}
 	}
-	string arg1(void)
-	{
-		argument1 = tokens[1];
-		return argument1;
-	}
-	int arg2(void)
-	{
-		argument2 = stoi(tokens[2]);
-		return argument2;
-	}
+
 
 };
 class CodeWriter
@@ -159,8 +183,8 @@ public:
 	string staticVariable;
 	CodeWriter(string directory, string filename)
 	{
-		filename = (filename.substr(0, filename.find("."))); // remove .vm if it is there
-		outputFileName = directory + filename + ".asm";
+		filename = (filename.substr(0, filename.find("."))); // remove .jack if it is there
+		outputFileName = directory + filename + ".vm";
 		setFileName(outputFileName);
 		writeBootstrapper();
 		staticVariable = (filename.substr(0, filename.find(".")));
@@ -241,7 +265,7 @@ public:
 		else {}
 		return;
 	}
-	void writePushPop(commandType pushOrPop, string segment, int index)
+	void writePushPop(tokenType pushOrPop, string segment, int index)
 	{
 		string segmentTranslated;
 		int segmentBaseAddress = 0;
@@ -294,14 +318,14 @@ public:
 			// segmentBaseAddress = 256;
 		}
 		segmentAddress = segmentBaseAddress + index;
-		if (pushOrPop == C_PUSH)
+		if (pushOrPop == KEYWORD)
 		{
 			// ASSEMBLY code to PUSH
 
 			//outputFileStream << "@SP\nA=M\nM=D\nA=A+1\nD=A\n@SP\nM=D" << endl;
 			outputFileStream << "@SP\nA=M\nM=D\n@SP\nM=M+1" << endl;
 		}
-		else if (pushOrPop == C_POP)
+		else if (pushOrPop == SYMBOL)
 		{
 			// ASSEMBLY code to POP
 			outputFileStream << "@SP\nM=M-1\nA=M\nD=M\n@R13\nA=M\nM=D" << endl;
@@ -399,7 +423,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	void DumpEntry(_finddata_t &data);
 	if (argc != 2)
 	{
-		cout << "You must input a single vm file (.vm) or a directory containing multiple vm files!" << endl;
+		cout << "You must input a single jack file (.jack) or a directory containing multiple jack files!" << endl;
 		return 1;
 	}
 	//int instructionCounter = 0;
@@ -414,7 +438,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	size_t last_slash_idx = filename.find_last_of("\\/");
 	//size_t fileStartPos = filename.find_last_of("/\\");
 	// CODE to check -- is input a directory or single .vm file?
-	if (filename.find(".vm") != string::npos)
+	if (filename.find(".jack") != string::npos)
 	{
 		const size_t backslashIndex = filename.rfind('\\');
 		fileLocation = filename;
@@ -444,7 +468,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 
 		asmFileName = filename.substr(last_slash_idx + 1);
 		inputFileName = asmFileName;
-		filename = filename + "\\*.vm";
+		filename = filename + "\\*.jack";
 		intptr_t ff = _findfirst(filename.c_str(), &data);
 		if (ff != -1)
 		{
@@ -463,7 +487,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 
 	if (fileList.size() == 0)
 	{
-		cout << "No .vm files were located. Exiting..." << endl;
+		cout << "No .jack files were located. Exiting..." << endl;
 		return 0;
 	}
 
@@ -471,60 +495,25 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	string fileNameCurrent;
 	for (int i = 0; i < fileList.size(); i++) {
 		fileNameCurrent = fileLocation + fileList[i];
-		Parser VMParser(fileNameCurrent);
+		JackTokenizer JackTokenizer(fileNameCurrent);
 		CodeWriter.staticVariable = fileList[i];
 		CodeWriter.staticVariable = CodeWriter.staticVariable.substr(0, CodeWriter.staticVariable.find("."));
-		while (VMParser.hasMoreCommands())
+		while (JackTokenizer.hasMoreCommands())
 		{
 			//	currentCode = "";
-			VMParser.advance();
-			commandType currentCommandType = VMParser.commandType();
-			if (currentCommandType != C_NULL)
+			JackTokenizer.advance();
+			tokenType currentCommandType = JackTokenizer.commandType();
+			if (currentCommandType != TOKEN_NULL)
 			{
-				if (currentCommandType == C_ARITHMETIC)
+				if (currentCommandType == KEYWORD)
 				{
-					CodeWriter.writeArithmetic(VMParser.currentCommand);
+					CodeWriter.writeArithmetic(JackTokenizer.currentCommand);
 				}
-				else if (currentCommandType == C_RETURN)
+				else 
 				{
 					CodeWriter.writeReturn();
 				}
-				else
-				{
-					VMParser.arg1();
-				}
-				if ((currentCommandType == C_PUSH) || (currentCommandType == C_POP) || (currentCommandType == C_FUNCTION) || (currentCommandType == C_CALL))
-				{
-					VMParser.arg2();
-				}
-				if (currentCommandType == C_LABEL)
-				{
-					CodeWriter.writeLabel(VMParser.argument1);
-				}
-				else if (currentCommandType == C_GOTO)
-				{
-					CodeWriter.writeGoto(VMParser.argument1);
-				}
-				else if (currentCommandType == C_IF)
-				{
-					CodeWriter.writeIf(VMParser.argument1);
-				}
-				else if (currentCommandType == C_CALL)
-				{
-					CodeWriter.writeCall(VMParser.argument1, VMParser.argument2);
-				}
-				else if (currentCommandType == C_FUNCTION)
-				{
-					CodeWriter.writeFunction(VMParser.argument1, VMParser.argument2);
-				}
-				else {}
-
-				if ((currentCommandType == C_PUSH) || (currentCommandType == C_POP))
-				{
-					CodeWriter.writePushPop(currentCommandType, VMParser.argument1, VMParser.argument2);
-				}
-
-				else {}
+				
 
 			}
 		}
