@@ -25,6 +25,7 @@ class JackTokenizer
 
 public:
 	vector<string> tokenString;
+	vector<tokenType> tokenList;
 	string argument1;// arg2;
 	int argument2, argument3;
 	string currentCommand;
@@ -187,51 +188,6 @@ public:
 
 
 };
-class CompilationEngine
-{
-	int localBase = 1;
-	int argumentBase = 2;
-	int thisBase = 3;
-	int thatBase = 4;
-	string outputFileName;
-	ofstream outputFileStream;
-	int jeqCounter = 0;
-	int jleCounter = 0;
-	int jgeCounter = 0;
-	int functionCounter = 0;
-	//	vector<string> symbolNameArray; // declaration
-	//	vector<int> symbolAddressArray; // declaration
-	//
-public:
-
-	CompilationEngine(string directory, string filename)
-	{
-		filename = (filename.substr(0, filename.find("."))); // remove .jack if it is there
-		outputFileName = directory + filename + ".xml";
-		setFileName(outputFileName);
-		// writeBootstrapper();
-	}
-	void setFileName(string outputFileName)
-	{
-		outputFileStream.open(outputFileName, ofstream::out);
-		return;
-	}
-	void Close()
-	{
-		outputFileStream.close();
-		return;
-	}
-	void CompileClass()
-	{
-		outputFileStream << "// Initializing boot strapper" << endl;
-		outputFileStream << "@256\nD=A\n@SP\nM=D" << endl;
-		outputFileStream << "// Calling Sys.init" << endl;
-		return;
-	}
-
-	~CompilationEngine()
-	{	}
-};
 
 class TokenWriter
 {
@@ -242,6 +198,7 @@ class TokenWriter
 	//
 public:
 	string staticVariable;
+	TokenWriter() {}
 	TokenWriter(string directory, string filename)
 	{
 		filename = (filename.substr(0, filename.find("."))); // remove .jack if it is there
@@ -307,6 +264,336 @@ public:
 	{	}
 };
 
+class CompilationEngine : public JackTokenizer
+{
+
+	string outputFileName;
+	ofstream outputFileStream;
+
+	//
+public:
+	int tokenCount = 0;
+	JackTokenizer* J;
+	CompilationEngine(string directory, string filename, JackTokenizer &Jack)
+	{
+		J = &Jack;
+		filename = (filename.substr(0, filename.find("."))); // remove .jack if it is there
+		outputFileName = directory + filename + ".xml";
+		setFileName(outputFileName);
+		// writeBootstrapper();
+	}
+	void setFileName(string outputFileName)
+	{
+		outputFileStream.open(outputFileName, ofstream::out);
+		return;
+	}
+	void Close()
+	{
+		outputFileStream.close();
+		return;
+	}
+	void CompileClass()
+	{
+		outputFileStream << "<class>" << endl;
+		writeKeyword(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeIdentifier(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		while ((J->tokenString[tokenCount] == "static") || (J->tokenString[tokenCount] == "field"))
+		{
+			CompileClassVarDec();
+		}
+		while ((J->tokenString[tokenCount] == "function") || (J->tokenString[tokenCount] == "method") || (J->tokenString[tokenCount] == "constructor"))
+		{
+			CompileSubroutine();
+		}
+		++tokenCount;
+		outputFileStream << "</class>" << endl;
+	}
+
+	void CompileClassVarDec()
+	{
+		outputFileStream << "<classVarDec>" << endl;
+		writeKeyword(J->tokenString[tokenCount]);
+		++tokenCount;
+		if (J->tokenList[tokenCount] == KEYWORD)
+		{
+			writeKeyword(J->tokenString[tokenCount]);
+		}
+		else
+		{
+			writeIdentifier(J->tokenString[tokenCount]);
+		}
+		++tokenCount;
+		writeIdentifier(J->tokenString[tokenCount]);
+		++tokenCount;
+		while (J->tokenString[tokenCount] == ",")
+		{
+			writeIdentifier(J->tokenString[tokenCount]);
+			++tokenCount;
+		}
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		outputFileStream << "</classVarDec>" << endl;
+	}
+	void CompileSubroutine()
+	{
+		outputFileStream << "<subroutineDec>" << endl;
+		writeKeyword(J->tokenString[tokenCount]);
+		++tokenCount;
+		if (J->tokenList[tokenCount] == KEYWORD)
+		{
+			writeKeyword(J->tokenString[tokenCount]);
+		}
+		else
+		{
+			writeIdentifier(J->tokenString[tokenCount]);
+		}
+		++tokenCount;
+		writeIdentifier(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		CompileParameterList();
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		outputFileStream << "<subroutineBody>" << endl;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		while (J->tokenString[tokenCount] == "var")
+		{
+			CompileVarDec();
+			++tokenCount;
+		}
+		CompileStatements();
+		++tokenCount;
+		outputFileStream << "</subroutineDec>" << endl;
+	}
+	void CompileParameterList()
+	{
+		outputFileStream << "<parameterList>" << endl;
+		if (J->tokenString[tokenCount] == ")")
+		{
+			outputFileStream << "</parameterList>" << endl;
+		}
+		else
+		{
+			writeIdentifier(J->tokenString[tokenCount]);
+			++tokenCount;
+			writeIdentifier(J->tokenString[tokenCount]);
+			++tokenCount;
+			while (J->tokenString[tokenCount] == ",")
+			{
+				writeIdentifier(J->tokenString[tokenCount]);
+				++tokenCount;
+			}
+		}
+		outputFileStream << "</parameterList>" << endl;
+	}
+	void CompileVarDec()
+	{
+		outputFileStream << "<varDec>" << endl;
+		writeKeyword(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeIdentifier(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeIdentifier(J->tokenString[tokenCount]);
+		++tokenCount;
+		while (J->tokenString[tokenCount] == ",")
+		{
+			writeIdentifier(J->tokenString[tokenCount]);
+			++tokenCount;
+		}
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		outputFileStream << "</varDec>" << endl;
+	}
+	void CompileStatements()
+	{
+		outputFileStream << "<statements>" << endl;
+		while ((J->tokenString[tokenCount] == "let") || (J->tokenString[tokenCount] == "if") || (J->tokenString[tokenCount] == "while") || (J->tokenString[tokenCount] == "do")||(J->tokenString[tokenCount] == "return"))
+		{
+			if (J->tokenString[tokenCount] == "let")
+			{
+				CompileLet();
+				++tokenCount;
+			}
+			else if (J->tokenString[tokenCount] == "if")
+			{
+				CompileIf();
+				++tokenCount;
+			}
+			else if (J->tokenString[tokenCount] == "while")
+			{
+				CompileWhile();
+				++tokenCount;
+			}
+			else if (J->tokenString[tokenCount] == "do")
+			{
+				CompileDo();
+				++tokenCount;
+			}
+			else if (J->tokenString[tokenCount] == "return")
+			{
+				CompileReturn();
+				++tokenCount;
+			}
+			else {}
+		}
+		outputFileStream << "</statements>" << endl;
+	}
+	void CompileDo()
+	{
+		outputFileStream << "<doStatement>" << endl;
+		writeKeyword(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeIdentifier(J->tokenString[tokenCount]);
+		++tokenCount;
+		CompileExpressionList();
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		outputFileStream << "</doStatement>" << endl;
+	}
+	void CompileLet()
+	{
+		outputFileStream << "<letStatement>" << endl;
+		writeKeyword(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeIdentifier(J->tokenString[tokenCount]);
+		++tokenCount;
+		if (J->tokenString[tokenCount] == "[")
+		{
+			writeSymbol(J->tokenString[tokenCount]);
+			++tokenCount;
+			CompileExpression();
+			writeSymbol(J->tokenString[tokenCount]);
+			++tokenCount;
+		}
+		else;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		CompileExpression();
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		outputFileStream << "</letStatement>" << endl;
+	}
+	void CompileWhile()
+	{
+		outputFileStream << "<whileStatement>" << endl;
+		writeKeyword(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		CompileExpression();
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		CompileStatements();
+		++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		outputFileStream << "</whileStatement>" << endl;
+	}
+	void CompileReturn()
+	{
+		outputFileStream << "<returnStatement>" << endl;
+		writeKeyword(J->tokenString[tokenCount]);
+		++tokenCount;
+		if (J->tokenString[tokenCount] == ";")
+		{
+
+		}
+		else 
+		{
+			CompileExpression();
+			++tokenCount;
+		}
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		outputFileStream << "</returnStatement>" << endl;
+	}
+	void CompileIf()
+	{
+		outputFileStream << "<ifStatement>" << endl;
+		writeKeyword(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		CompileExpression();
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);
+		++tokenCount;
+		CompileStatements();
+		++tokenCount;
+		if (J->tokenString[tokenCount] == "else")
+		{
+			writeKeyword(J->tokenString[tokenCount]);
+			++tokenCount;
+			writeSymbol(J->tokenString[tokenCount]);
+			++tokenCount;
+			CompileStatements();
+			writeSymbol(J->tokenString[tokenCount]);
+			++tokenCount;
+		}
+		else;
+		outputFileStream << "</ifStatement>" << endl;
+	}
+	void CompileExpression()
+	{
+		outputFileStream << "<expression>" << endl;
+	}
+	void CompileTerm()
+	{
+		outputFileStream << "<term>" << endl;
+	}
+	void CompileExpressionList()
+	{
+		outputFileStream << "<expressionlist>" << endl;
+	}
+	void writeKeyword(string input)
+	{
+		outputFileStream << "<keyword> " << input << " </keyword>" << endl;
+		return;
+	}
+	void writeSymbol(string input)
+	{
+		if (input == "\"") { input = "&quot;"; }
+		else if (input == "<") { input = "&lt;"; }
+		else if (input == ">") { input = "&gt;"; }
+		else if (input == "&") { input = "&amp;"; }
+		else;
+		outputFileStream << "<symbol> " << input << " </symbol>" << endl;
+		return;
+	}
+	void writeIdentifier(string input)
+	{
+		outputFileStream << "<identifier> " << input << " </identifier>" << endl;
+		return;
+	}
+	void writeStringConst(string input)
+	{
+		size_t inputSize = input.size();
+		string temp = input.substr(1, inputSize - 2);
+		outputFileStream << "<stringConstant> " << temp << " </stringConstant>" << endl;
+		return;
+	}
+	void writeIntConst(string input)
+	{
+		outputFileStream << "<integerConstant> " << input << " </integerConstant>" << endl;
+		return;
+	}
+	~CompilationEngine()
+	{	}
+};
+
+
+
 int main(int argc, const char *argv[])  // alternatively: int main(int argc, char** argv)
 										// argc = number of strings pointed to by argv
 										// argv holds the array of inputs to the program, argv[0] holds "Assembler", argv[1] holds command line input
@@ -325,7 +612,6 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	string inputFileName, asmFileName;
 	string fileLocation;
 	vector<string> fileList;
-	vector<tokenType> tokenList;
 	_finddata_t data;
 	size_t last_slash_idx = filename.find_last_of("\\/");
 	//size_t fileStartPos = filename.find_last_of("/\\");
@@ -389,7 +675,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	for (int i = 0; i < fileList.size(); i++) {
 		fileNameCurrent = fileLocation + fileList[i];
 		TokenWriter TokenWriter(fileLocation, fileList[i]);
-		CompilationEngine CompilationEngine(fileLocation, fileList[i]);
+
 		JackTokenizer JackTokenizer(fileNameCurrent);
 		while (JackTokenizer.hasMoreCommands())
 		{
@@ -405,28 +691,29 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 				if (currentTokenType == KEYWORD)
 				{
 					TokenWriter.writeKeyword(JackTokenizer.tokenString[j]);
-					tokenList.push_back(currentTokenType);
+					JackTokenizer.tokenList.push_back(currentTokenType);
 				}
 				else if (currentTokenType == SYMBOL)
 				{
 					TokenWriter.writeSymbol(JackTokenizer.tokenString[j]);
-					tokenList.push_back(currentTokenType);
+					JackTokenizer.tokenList.push_back(currentTokenType);
 				}
 				else if (currentTokenType == IDENTIFIER)
 				{
 					TokenWriter.writeIdentifier(JackTokenizer.tokenString[j]);
-					tokenList.push_back(currentTokenType);
+					JackTokenizer.tokenList.push_back(currentTokenType);
 				}
 				else if (currentTokenType == STRING_CONST)
 				{
 					TokenWriter.writeStringConst(JackTokenizer.tokenString[j]);
-					tokenList.push_back(currentTokenType);
+					JackTokenizer.tokenList.push_back(currentTokenType);
 				}
 				else if (currentTokenType == INT_CONST)
 				{
 					TokenWriter.writeIntConst(JackTokenizer.tokenString[j]);
-					tokenList.push_back(currentTokenType);
+					JackTokenizer.tokenList.push_back(currentTokenType);
 				}
+				
 				else;
 			}
 			
@@ -434,6 +721,9 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		}
 		TokenWriter.writeFooter();
 		TokenWriter.Close();
+		
+		CompilationEngine CompilationEngine(fileLocation, fileList[i], JackTokenizer);
+		CompilationEngine.tokenCount = 0;
 		CompilationEngine.CompileClass();
 		CompilationEngine.Close();
 	}
