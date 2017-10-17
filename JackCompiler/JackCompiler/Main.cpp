@@ -20,10 +20,11 @@ class JackTokenizer
 	ifstream inputFileStream;
 	size_t firstCharacter;
 	vector<char> tokens;
-	vector<string> tokenString;
+	
 	//	size_t lastCharacter;
 
 public:
+	vector<string> tokenString;
 	string argument1;// arg2;
 	int argument2, argument3;
 	string currentCommand;
@@ -62,8 +63,34 @@ public:
 		if (!inputFileStream.eof())
 		{
 			getline(inputFileStream, currentCommand);
+
+			
+			bool multilineComment = false;
+			if (string::npos != currentCommand.find("/*")) // Search for "/*", if found, then we have to remove the multiline comment
+			{
+				multilineComment = true;
+				while (multilineComment)
+				{
+					size_t commentStartPosition = currentCommand.find("/*");
+					if (string::npos == commentStartPosition)
+					{
+						commentStartPosition = 0;
+					}
+					size_t commentEndPosition = currentCommand.find("*/");
+					if (string::npos != commentEndPosition) // If we find the end of the multiline comment, then we set the flag to false
+					{
+						multilineComment = false;
+						currentCommand.erase(commentStartPosition, commentEndPosition - commentStartPosition+2);
+						return;
+					}
+					getline(inputFileStream, currentCommand);
+				}
+
+			}
 			currentCommand = currentCommand.substr(0, currentCommand.find("//"));
-			currentCommand = currentCommand.substr(0, currentCommand.find("/*"));
+			// currentCommand = currentCommand.substr(0, currentCommand.find("/*"));
+
+
 			size_t lastCharacter = currentCommand.find_last_not_of(" \t\r\n");
 			size_t firstCharacter = currentCommand.find_first_not_of(" \t\r\n");
 
@@ -82,13 +109,13 @@ public:
 			//istream_iterator<string> itt(iss);
 			while (itt != eos)
 			{ 
-				while ((*itt != ' ') && (*itt != '{') && (*itt != '(') && (*itt != '=') && (*itt != '}') && (*itt != ')') && (*itt != ';') && (*itt != ',') && (*itt != '[') && (*itt != ']') && (*itt != '-') && (*itt != '+') && (*itt != '*') && (*itt != '|') && (*itt != '/') && (*itt != '.'))
+				while ((*itt != ' ') && (*itt != '{') && (*itt != '(') && (*itt != '=') && (*itt != '}') && (*itt != ')') && (*itt != ';') && (*itt != ',') && (*itt != '[') && (*itt != ']') && (*itt != '-') && (*itt != '+') && (*itt != '*') && (*itt != '|') && (*itt != '/') && (*itt != '.') && (*itt != '&') && (*itt != '<') && (*itt != '>') && (*itt != '~'))
 				{
 					if (*itt == '\"')
 					{
 						do {
 							tokens.push_back(*itt);
-							cout << *itt;
+							//cout << *itt;
 							++itt;
 						} while (*itt != '\"');
 						tokens.push_back(*itt);
@@ -97,7 +124,7 @@ public:
 					else
 					{
 						tokens.push_back(*itt);
-						cout << *itt;
+						//cout << *itt;
 						++itt;
 					}
 				}
@@ -119,7 +146,6 @@ public:
 
 				
 			}
-			token = "TEST";
 			//tokens = { istream_iterator<string>{iss},istream_iterator<string>{} };
 
 		}
@@ -129,36 +155,32 @@ public:
 	}
 
 
-	tokenType commandType()
+	tokenType tokenType(int j)
 	{
 		//firstCharacter = currentCommand.find_first_not_of(" \t\r\n");
-		if (token.empty())
+		if (tokenString[j].empty())
 		{
 			return TOKEN_NULL;
 		}
 		else
 		{
-			if ((token == "CLASS") || (token == "METHOD") || (token == "FUNCTION") || (token == "CONSTRUCTOR") || (token == "INT") || (token == "BOOLEAN") || (token == "CHAR") || (token == "VOID") || (token == "VAR") || (token == "STATIC") || (token == "FIELD") || (token == "LET") || (token == "DO") || (token == "IF") || (token == "ELSE") || (token == "WHILE") || (token == "RETURN") || (token == "TRUE") || (token == "FALSE") || (token == "NULL") || (token == "THIS"))
+			if ((tokenString[j] == "class") || (tokenString[j] == "method") || (tokenString[j] == "function") || (tokenString[j] == "constructor") || (tokenString[j] == "int") || (tokenString[j] == "boolean") || (tokenString[j] == "char") || (tokenString[j] == "void") || (tokenString[j] == "var") || (tokenString[j] == "static") || (tokenString[j] == "field") || (tokenString[j] == "let") || (tokenString[j] == "do") || (tokenString[j] == "if") || (tokenString[j] == "else") || (tokenString[j] == "while") || (tokenString[j] == "return") || (tokenString[j] == "true") || (tokenString[j] == "false") || (tokenString[j] == "null") || (tokenString[j] == "this"))
 			{
 				return KEYWORD;
 			}
-			else if ((token == "PUSH") || (token == "push"))
+			else if ((tokenString[j] == "{") || (tokenString[j] == "}") || (tokenString[j] == "(") || (tokenString[j] == ")") || (tokenString[j] == "[") || (tokenString[j] == "]") || (tokenString[j] == "-") || (tokenString[j] == ",") || (tokenString[j] == ";") || (tokenString[j] == "+") || (tokenString[j] == "-") || (tokenString[j] == "*") || (tokenString[j] == "/") || (tokenString[j] == "&") || (tokenString[j] == "|") || (tokenString[j] == "<") || (tokenString[j] == ">") || (tokenString[j] == "=") || (tokenString[j] == "~") || (tokenString[j] == "."))
 			{
 				return SYMBOL;
 			}
-			else if ((token == "POP") || (token == "pop"))
-			{
-				return IDENTIFIER;
-			}
-			else if ((token == "LABEL") || (token == "label"))
-			{
-				return INT_CONST;
-			}
-			else if ((token == "LABEL") || (token == "label"))
+			else if (string::npos != tokenString[j].find('/"'))
 			{
 				return STRING_CONST;
 			}
-			else return TOKEN_ERROR;
+			else if ((tokenString[j].at(0)=='0') || (tokenString[j].at(0) == '1') || (tokenString[j].at(0) == '2') || (tokenString[j].at(0) == '3') || (tokenString[j].at(0) == '4') || (tokenString[j].at(0) == '5') || (tokenString[j].at(0) == '6') || (tokenString[j].at(0) == '7') || (tokenString[j].at(0) == '8') || (tokenString[j].at(0) == '9'))
+			{
+				return INT_CONST;
+			}
+			else return IDENTIFIER;
 		}
 	}
 
@@ -416,6 +438,80 @@ public:
 	{	}
 };
 
+class TokenWriter
+{
+
+	string outputFileNameT;
+	ofstream outputFileStreamT;
+
+	//
+public:
+	string staticVariable;
+	TokenWriter(string directory, string filename)
+	{
+		filename = (filename.substr(0, filename.find("."))); // remove .jack if it is there
+		outputFileNameT = directory + filename + ".xml";
+		setFileName(outputFileNameT);
+		writeHeader();
+		staticVariable = (filename.substr(0, filename.find(".")));
+	}
+	void setFileName(string outputFileName)
+	{
+		outputFileStreamT.open(outputFileName, ofstream::out);
+		return;
+	}
+	void Close()
+	{
+		outputFileStreamT.close();
+		return;
+	}
+	void writeHeader()
+	{
+		// outputFileStreamT << "<?xml version=\"1.0\"?>" << endl;
+		outputFileStreamT << "<tokens>" << endl;
+		return;
+	}
+	void writeFooter()
+	{
+		outputFileStreamT << "</tokens>" << endl;
+		return;
+	}
+	void writeKeyword(string input)
+	{
+		outputFileStreamT << "<keyword> " << input << " </keyword>" << endl;
+		return;
+	}
+	void writeSymbol(string input)
+	{
+		if (input == "\"") { input = "&quot;"; }
+		else if (input == "<") { input = "&lt;"; }
+		else if (input == ">") { input = "&gt;"; }
+		else if (input == "&") { input = "&amp;"; }
+		else;
+		outputFileStreamT << "<symbol> " << input << " </symbol>" << endl;
+		return;
+	}
+	void writeIdentifier(string input)
+	{
+		outputFileStreamT << "<identifier> " << input << " </identifier>" << endl;
+		return;
+	}
+	void writeStringConst(string input)
+	{
+		size_t inputSize = input.size();
+		string temp = input.substr(1, inputSize - 2);
+		outputFileStreamT << "<stringConstant> " << temp << " </stringConstant>" << endl;
+		return;
+	}
+	void writeIntConst(string input)
+	{
+		outputFileStreamT << "<integerConstant> " << input << " </integerConstant>" << endl;
+		return;
+	}
+	~TokenWriter()
+	{	}
+};
+
 int main(int argc, const char *argv[])  // alternatively: int main(int argc, char** argv)
 										// argc = number of strings pointed to by argv
 										// argv holds the array of inputs to the program, argv[0] holds "Assembler", argv[1] holds command line input
@@ -492,6 +588,7 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	}
 
 	CodeWriter CodeWriter(fileLocation, asmFileName);
+	TokenWriter TokenWriter(fileLocation, asmFileName);
 	string fileNameCurrent;
 	for (int i = 0; i < fileList.size(); i++) {
 		fileNameCurrent = fileLocation + fileList[i];
@@ -502,24 +599,41 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		{
 			//	currentCode = "";
 			JackTokenizer.advance();
-			tokenType currentCommandType = JackTokenizer.commandType();
-			if (currentCommandType != TOKEN_NULL)
+		}
+		for (int j = 0; j < JackTokenizer.tokenString.size(); j++)
+		{
+			tokenType currentTokenType = JackTokenizer.tokenType(j);
+			cout << JackTokenizer.tokenString[j] << "\t\t\t\t" << currentTokenType << endl;
+			if (currentTokenType != TOKEN_NULL)
 			{
-				if (currentCommandType == KEYWORD)
+				if (currentTokenType == KEYWORD)
 				{
-					CodeWriter.writeArithmetic(JackTokenizer.currentCommand);
+					TokenWriter.writeKeyword(JackTokenizer.tokenString[j]);
 				}
-				else 
+				else if (currentTokenType == SYMBOL)
 				{
-					CodeWriter.writeReturn();
+					TokenWriter.writeSymbol(JackTokenizer.tokenString[j]);
 				}
-				
-
+				else if (currentTokenType == IDENTIFIER)
+				{
+					TokenWriter.writeIdentifier(JackTokenizer.tokenString[j]);
+				}
+				else if (currentTokenType == STRING_CONST)
+				{
+					TokenWriter.writeStringConst(JackTokenizer.tokenString[j]);
+				}
+				else if (currentTokenType == INT_CONST)
+				{
+					TokenWriter.writeIntConst(JackTokenizer.tokenString[j]);
+				}
+				else;
 			}
+
 		}
 	}
 	CodeWriter.Close();
-
+	TokenWriter.writeFooter();
+	TokenWriter.Close();
 	return 0;
 }
 
