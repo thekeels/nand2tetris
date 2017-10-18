@@ -9,7 +9,7 @@
 
 #include <io.h>
 using namespace std;
-
+enum varType { STATIC, FIELD, ARG, VAR, NONE };
 enum tokenType { KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST, TOKEN_NULL, TOKEN_ERROR};
 // 0 = KEYWORD, 1= SYMBOL, 2 = IDENTIFIER, 3 = INT_CONST, 4 = STRING_CONST
 
@@ -240,15 +240,61 @@ public:
 	{	}
 };
 
+class SymbolTable
+{
+	vector<string> nameColClass;	// Creates a column with the variable names -- Class-scope Table
+	vector<string> typeColClass;	// Creates a column with the type of the variable -- Class-scope Table
+	vector<varType> kindColClass;	// Creates a column with the memory type of the variable -- Class-scope Table
+	vector<int> indexColClass;		// Creates a column with the index of the variable -- Class-scope Table
+	vector<string> nameColMethod;	// Creates a column with the variable names -- Method-scope Table
+	vector<string> typeColMethod;	// Creates a column with the type of the variable -- Method-scope Table
+	vector<varType> kindColMethod;	// Creates a column with the memory type of the variable -- Method-scope Table
+	vector<int> indexColMethod;		// Creates a column with the index of the variable -- Method-scope Table
+	int staticCounterC, argCounterC, varCounterC, fieldCounterC = 0; // Counters for class identifiers
+	int staticCounterM, argCounterM, varCounterM, fieldCounterM = 0; // Counters for method identifiers
+
+public:
+
+	SymbolTable() {}
+	void startSubroutine() 
+	{
+		nameColMethod.clear();
+		typeColMethod.clear();
+		kindColMethod.clear();
+		indexColMethod.clear();
+		return;
+	}
+	void Define(string name, string type, varType kind) {}
+	int VarCount(varType kind)
+	{
+		if (kind == STATIC)
+		{
+			return staticCounterC;
+		}
+		else if (kind == FIELD)
+			return fieldCounterC;
+		else if (kind == VAR)
+			return varCounterC;
+		else if (kind == ARG)
+			return argCounterC;
+	}
+	varType KindOf(string name) {}
+	string TypeOf(string name) {}
+	int IndexOf(string name) {}
+	~SymbolTable() {}
+
+
+};
 class CompilationEngine : public JackTokenizer
 {
-
+	SymbolTable symbolTable;	
 	string outputFileName;
 	ofstream outputFileStream;
 
 public:
 	int tokenCount = 0;
 	JackTokenizer* J;
+
 	CompilationEngine(string directory, string filename, JackTokenizer &Jack)
 	{
 		J = &Jack;
@@ -726,7 +772,6 @@ public:
 	{	}
 };
 
-
 int main(int argc, const char *argv[])  // alternatively: int main(int argc, char** argv)
 										// argc = number of strings pointed to by argv
 										// argv holds the array of inputs to the program, argv[0] holds "Assembler", argv[1] holds command line input
@@ -737,7 +782,6 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		cout << "You must input a single jack file (.jack) or a directory containing multiple jack files!" << endl;
 		return 1;
 	}
-
 	string filename(argv[1]);
 	string inputFileName, asmFileName;
 	string fileLocation;
