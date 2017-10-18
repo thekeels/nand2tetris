@@ -280,7 +280,6 @@ public:
 		filename = (filename.substr(0, filename.find("."))); // remove .jack if it is there
 		outputFileName = directory + filename + ".xml";
 		setFileName(outputFileName);
-		// writeBootstrapper();
 	}
 	void setFileName(string outputFileName)
 	{
@@ -370,7 +369,6 @@ public:
 			CompileVarDec();								// prints all the VarDecs
 		}
 		CompileStatements();								// prints all the statements
-		//++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> }			
 		++tokenCount;
 		outputFileStream << "</subroutineBody>" << endl;	// </subroutineBody>
@@ -400,7 +398,16 @@ public:
 			{
 				writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
 				++tokenCount;
-				writeIdentifier(J->tokenString[tokenCount]);	// prints remaining varNames, if they exist
+				if (J->tokenList[tokenCount] == KEYWORD)
+				{
+					writeKeyword(J->tokenString[tokenCount]);		// prints <keyword> int/char/boolean
+				}
+				else
+				{
+					writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
+				}
+				++tokenCount;
+				writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
 				++tokenCount;
 			}
 		}
@@ -441,27 +448,22 @@ public:
 			if (J->tokenString[tokenCount] == "let")	
 			{
 				CompileLet();								// prints Let
-				//++tokenCount;
 			}
 			else if (J->tokenString[tokenCount] == "if")
 			{
 				CompileIf();								// prints If
-				//++tokenCount;
 			}
 			else if (J->tokenString[tokenCount] == "while")
 			{
 				CompileWhile();								// prints While
-				//++tokenCount;
 			}
 			else if (J->tokenString[tokenCount] == "do")
 			{
 				CompileDo();								// prints Do
-				//++tokenCount;
 			}
 			else if (J->tokenString[tokenCount] == "return")
 			{
 				CompileReturn();							// prints Return
-				//++tokenCount;
 			}
 			else {}
 		}
@@ -534,7 +536,6 @@ public:
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> {
 		++tokenCount;
 		CompileStatements();									// print the statements
-		//++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> }
 		++tokenCount;
 		outputFileStream << "</whileStatement>" << endl;		// </whileStatements>
@@ -550,8 +551,7 @@ public:
 		}
 		else 
 		{
-			CompileExpression();								// otherwise, print the expression			
-			++tokenCount;	
+			CompileExpression();								// otherwise, print the expression				
 		}
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
 		++tokenCount;
@@ -588,59 +588,75 @@ public:
 	void CompileExpression()
 	{
 		outputFileStream << "<expression>" << endl;				// <expression>
-		CompileTerm();											// Print the term
-		outputFileStream << "</expression>" << endl;
+		while ((J->tokenString[tokenCount] != ")") && (J->tokenString[tokenCount] != ";") && (J->tokenString[tokenCount] != "]"))
+		{
+			CompileTerm();											// Print the term
+			while ((J->tokenString[tokenCount] == "-") || (J->tokenString[tokenCount] == "+") || (J->tokenString[tokenCount] == "*") || (J->tokenString[tokenCount] == "/") || (J->tokenString[tokenCount] == "&") || (J->tokenString[tokenCount] == "|") || (J->tokenString[tokenCount] == "<") || (J->tokenString[tokenCount] == ">") || (J->tokenString[tokenCount] == "="))
+			{
+				writeSymbol(J->tokenString[tokenCount]);			// <symbol> op symbol
+				++tokenCount;
+				CompileTerm();
+			}
+			outputFileStream << "</expression>" << endl;
+			if (J->tokenString[tokenCount] == ",")
+			{
+				break;
+			}
+		}
 	}
 	void CompileTerm()
 	{
-		outputFileStream << "<term>" << endl;
-		while ((J->tokenString[tokenCount] != ")") && (J->tokenString[tokenCount] != ";") && (J->tokenString[tokenCount] != "]"))
-		{
-
 			if (J->tokenList[tokenCount] == INT_CONST)				// integer constant case
 			{
-				++tokenCount;
+				outputFileStream << "<term>" << endl;
 				writeIntConst(J->tokenString[tokenCount]);			// <integerConst> 
 				++tokenCount;
-				writeSymbol(J->tokenString[tokenCount]);			// <symbol> "op"
-				++tokenCount;
+				outputFileStream << "</term>" << endl;
 			}
 			else if (J->tokenList[tokenCount] == STRING_CONST)		// string constant case
 			{
+				outputFileStream << "<term>" << endl;
 				writeStringConst(J->tokenString[tokenCount]);			// <stringConst> 
 				++tokenCount;
-				writeSymbol(J->tokenString[tokenCount]);			// <symbol> "op"
-				++tokenCount;
+				outputFileStream << "</term>" << endl;
 			}
 			else if (J->tokenList[tokenCount] == KEYWORD)			// keyword constant case
 			{
+				outputFileStream << "<term>" << endl;
 				writeKeyword(J->tokenString[tokenCount]);			// <keyword> 
 				++tokenCount;
-				writeSymbol(J->tokenString[tokenCount]);			// <symbol> "op"
-				++tokenCount;
+				outputFileStream << "</term>" << endl;
 			}
 			else if (J->tokenList[tokenCount] == SYMBOL)			// Unary op case/expression
 			{
 				if (J->tokenString[tokenCount] == "(")				// expression
 				{
+					outputFileStream << "<term>" << endl;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 					++tokenCount;
 					CompileExpression();								// print expression
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 					++tokenCount;
+					outputFileStream << "</term>" << endl;
 				}
-				else
+				else if ((J->tokenString[tokenCount] == "-")|| (J->tokenString[tokenCount] == "~"))				// "-" or "~" unary op
 				{
+					outputFileStream << "<term>" << endl;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> "unary op"
 					++tokenCount;
 					CompileTerm();										// unary op term
-					//++tokenCount;
+					outputFileStream << "</term>" << endl;
+				}
+				else
+				{
+					return;
 				}
 			}
 			else
 			{
 				// varName/subroutine
-				writeIdentifier(J->tokenString[tokenCount]);			// <keyword> 
+				outputFileStream << "<term>" << endl;
+				writeIdentifier(J->tokenString[tokenCount]);			// <identifier> varName 
 				++tokenCount;
 				if (J->tokenString[tokenCount] == "(")					// subroutine call
 				{
@@ -666,6 +682,19 @@ public:
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 						++tokenCount;
 					}
+					
+				}
+				else if (J->tokenString[tokenCount] == ".")
+				{
+					writeSymbol(J->tokenString[tokenCount]);			// <symbol> .
+					++tokenCount;
+					writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
+					++tokenCount;
+					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
+					++tokenCount;
+					CompileExpressionList();							// calls expression list
+					writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
+					++tokenCount;
 				}
 				else if (J->tokenString[tokenCount] == "[")				// array
 				{
@@ -676,22 +705,28 @@ public:
 					++tokenCount;
 				}
 				else {}
+				outputFileStream << "</term>" << endl;
 			}
-		} 
-		outputFileStream << "</term>" << endl;
+
 	}
 	void CompileExpressionList()
 	{
-		outputFileStream << "<expressionlist>" << endl;
-		CompileExpression();
-		while (J->tokenString[tokenCount] == ",")
+		outputFileStream << "<expressionList>" << endl;
+		if (J->tokenString[tokenCount] == ")")
 		{
-			writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
-			++tokenCount;
-			CompileExpression();
-			++tokenCount;
+
 		}
-		outputFileStream << "</expressionlist>" << endl;
+		else
+		{
+			CompileExpression();
+			while (J->tokenString[tokenCount] == ",")
+			{
+				writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
+				++tokenCount;
+				CompileExpression();
+			}
+		}
+		outputFileStream << "</expressionList>" << endl;
 	}
 	void writeKeyword(string input)
 	{
