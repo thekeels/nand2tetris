@@ -294,267 +294,404 @@ public:
 	}
 	void CompileClass()
 	{
-		outputFileStream << "<class>" << endl;
-		writeKeyword(J->tokenString[tokenCount]);
+		outputFileStream << "<class>" << endl;			// <class>
+		writeKeyword(J->tokenString[tokenCount]);		// <keyword> class
+		++tokenCount;				
+		writeIdentifier(J->tokenString[tokenCount]);	// <identifier> Main
 		++tokenCount;
-		writeIdentifier(J->tokenString[tokenCount]);
-		++tokenCount;
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);		// <symbol> ;
 		++tokenCount;
 		while ((J->tokenString[tokenCount] == "static") || (J->tokenString[tokenCount] == "field"))
 		{
-			CompileClassVarDec();
+			CompileClassVarDec();						// Prints out all the Class Variable Definitions
 		}
 		while ((J->tokenString[tokenCount] == "function") || (J->tokenString[tokenCount] == "method") || (J->tokenString[tokenCount] == "constructor"))
 		{
-			CompileSubroutine();
+			CompileSubroutine();						// Moves on to print all the subroutines
 		}
+		writeSymbol(J->tokenString[tokenCount]);		// <symbol> }
 		++tokenCount;
-		outputFileStream << "</class>" << endl;
+		outputFileStream << "</class>" << endl;			// </class>
 	}
 
 	void CompileClassVarDec()
 	{
-		outputFileStream << "<classVarDec>" << endl;
-		writeKeyword(J->tokenString[tokenCount]);
+		outputFileStream << "<classVarDec>" << endl;	// <classVarDec>
+		writeKeyword(J->tokenString[tokenCount]);		// "<keyword> static " || "<keyword field "
 		++tokenCount;
 		if (J->tokenList[tokenCount] == KEYWORD)
 		{
-			writeKeyword(J->tokenString[tokenCount]);
+			writeKeyword(J->tokenString[tokenCount]);	// prints <keyword> int/char/boolean
 		}
 		else
 		{
-			writeIdentifier(J->tokenString[tokenCount]);
+			writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
 		}
 		++tokenCount;
-		writeIdentifier(J->tokenString[tokenCount]);
+		writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
 		++tokenCount;
 		while (J->tokenString[tokenCount] == ",")
 		{
-			writeIdentifier(J->tokenString[tokenCount]);
+			writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
+			++tokenCount;
+			writeIdentifier(J->tokenString[tokenCount]);	// prints remaining varNames, if they exist
 			++tokenCount;
 		}
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);			// <symbol> ;
 		++tokenCount;
-		outputFileStream << "</classVarDec>" << endl;
+		outputFileStream << "</classVarDec>" << endl;		// </classVarDec>
 	}
 	void CompileSubroutine()
 	{
-		outputFileStream << "<subroutineDec>" << endl;
-		writeKeyword(J->tokenString[tokenCount]);
+		outputFileStream << "<subroutineDec>" << endl;		// <subroutineDec>
+		writeKeyword(J->tokenString[tokenCount]);			// <keyword> constructor/method/function
 		++tokenCount;
 		if (J->tokenList[tokenCount] == KEYWORD)
 		{
-			writeKeyword(J->tokenString[tokenCount]);
+			writeKeyword(J->tokenString[tokenCount]);		// prints a <keyword> void/int/char/boolean
 		}
 		else
 		{
-			writeIdentifier(J->tokenString[tokenCount]);
+			writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
 		}
 		++tokenCount;
-		writeIdentifier(J->tokenString[tokenCount]);
+		writeIdentifier(J->tokenString[tokenCount]);		// <identifier> subroutineName
 		++tokenCount;
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 		++tokenCount;
-		CompileParameterList();
-		writeSymbol(J->tokenString[tokenCount]);
+		CompileParameterList();								// prints the Parameter List
+		writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 		++tokenCount;
-		outputFileStream << "<subroutineBody>" << endl;
-		writeSymbol(J->tokenString[tokenCount]);
+		outputFileStream << "<subroutineBody>" << endl;		// <subroutineBody>
+		writeSymbol(J->tokenString[tokenCount]);			// <symbol> {		
 		++tokenCount;
 		while (J->tokenString[tokenCount] == "var")
 		{
-			CompileVarDec();
-			++tokenCount;
+			CompileVarDec();								// prints all the VarDecs
 		}
-		CompileStatements();
+		CompileStatements();								// prints all the statements
+		//++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);			// <symbol> }			
 		++tokenCount;
-		outputFileStream << "</subroutineDec>" << endl;
+		outputFileStream << "</subroutineBody>" << endl;	// </subroutineBody>
+		outputFileStream << "</subroutineDec>" << endl;		// </subroutineDec>
 	}
 	void CompileParameterList()
 	{
-		outputFileStream << "<parameterList>" << endl;
+		outputFileStream << "<parameterList>" << endl;		// <parameterList>
 		if (J->tokenString[tokenCount] == ")")
 		{
-			outputFileStream << "</parameterList>" << endl;
+															// if parameter list is empty, do nothing
 		}
 		else
 		{
-			writeIdentifier(J->tokenString[tokenCount]);
+			if (J->tokenList[tokenCount] == KEYWORD)
+			{
+				writeKeyword(J->tokenString[tokenCount]);		// prints <keyword> int/char/boolean
+			}
+			else
+			{
+				writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
+			}
 			++tokenCount;
-			writeIdentifier(J->tokenString[tokenCount]);
+			writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
 			++tokenCount;
 			while (J->tokenString[tokenCount] == ",")
 			{
-				writeIdentifier(J->tokenString[tokenCount]);
+				writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
+				++tokenCount;
+				writeIdentifier(J->tokenString[tokenCount]);	// prints remaining varNames, if they exist
 				++tokenCount;
 			}
 		}
-		outputFileStream << "</parameterList>" << endl;
+		outputFileStream << "</parameterList>" << endl;			// </parameterList>
 	}
 	void CompileVarDec()
 	{
 		outputFileStream << "<varDec>" << endl;
-		writeKeyword(J->tokenString[tokenCount]);
+		writeKeyword(J->tokenString[tokenCount]);				// <keyword> var
 		++tokenCount;
-		writeIdentifier(J->tokenString[tokenCount]);
+		if (J->tokenList[tokenCount] == KEYWORD)
+		{
+			writeKeyword(J->tokenString[tokenCount]);		// prints <keyword> int/char/boolean
+		}
+		else
+		{
+			writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
+		}
 		++tokenCount;
-		writeIdentifier(J->tokenString[tokenCount]);
+		writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
 		++tokenCount;
 		while (J->tokenString[tokenCount] == ",")
 		{
-			writeIdentifier(J->tokenString[tokenCount]);
+			writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
+			++tokenCount;
+			writeIdentifier(J->tokenString[tokenCount]);	// prints remaining varNames, if they exist
 			++tokenCount;
 		}
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);			// <symbol> ;
 		++tokenCount;
-		outputFileStream << "</varDec>" << endl;
+		outputFileStream << "</varDec>" << endl;			// </varDec>
 	}
 	void CompileStatements()
 	{
-		outputFileStream << "<statements>" << endl;
+		outputFileStream << "<statements>" << endl;			// <statements>
 		while ((J->tokenString[tokenCount] == "let") || (J->tokenString[tokenCount] == "if") || (J->tokenString[tokenCount] == "while") || (J->tokenString[tokenCount] == "do")||(J->tokenString[tokenCount] == "return"))
 		{
-			if (J->tokenString[tokenCount] == "let")
+			if (J->tokenString[tokenCount] == "let")	
 			{
-				CompileLet();
-				++tokenCount;
+				CompileLet();								// prints Let
+				//++tokenCount;
 			}
 			else if (J->tokenString[tokenCount] == "if")
 			{
-				CompileIf();
-				++tokenCount;
+				CompileIf();								// prints If
+				//++tokenCount;
 			}
 			else if (J->tokenString[tokenCount] == "while")
 			{
-				CompileWhile();
-				++tokenCount;
+				CompileWhile();								// prints While
+				//++tokenCount;
 			}
 			else if (J->tokenString[tokenCount] == "do")
 			{
-				CompileDo();
-				++tokenCount;
+				CompileDo();								// prints Do
+				//++tokenCount;
 			}
 			else if (J->tokenString[tokenCount] == "return")
 			{
-				CompileReturn();
-				++tokenCount;
+				CompileReturn();							// prints Return
+				//++tokenCount;
 			}
 			else {}
 		}
-		outputFileStream << "</statements>" << endl;
+		outputFileStream << "</statements>" << endl;		// </statements>
 	}
 	void CompileDo()
 	{
-		outputFileStream << "<doStatement>" << endl;
-		writeKeyword(J->tokenString[tokenCount]);
+		outputFileStream << "<doStatement>" << endl;		// <doStatement>
+		writeKeyword(J->tokenString[tokenCount]);			// <keyword> do
 		++tokenCount;
-		writeIdentifier(J->tokenString[tokenCount]);
+		writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName/className/varName
 		++tokenCount;
-		CompileExpressionList();
-		writeSymbol(J->tokenString[tokenCount]);
+		if (J->tokenString[tokenCount] == "(")
+		{
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
+			++tokenCount;
+			CompileExpressionList();							// calls expression list
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
+			++tokenCount;
+		}
+		else
+		{
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> .
+			++tokenCount;
+			writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
+			++tokenCount;
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
+			++tokenCount;
+			CompileExpressionList();							// calls expression list
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
+			++tokenCount;
+		}
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;		
 		++tokenCount;
-		writeSymbol(J->tokenString[tokenCount]);
-		++tokenCount;
-		outputFileStream << "</doStatement>" << endl;
+		outputFileStream << "</doStatement>" << endl;			// </doStatement>
 	}
 	void CompileLet()
 	{
-		outputFileStream << "<letStatement>" << endl;
-		writeKeyword(J->tokenString[tokenCount]);
+		outputFileStream << "<letStatement>" << endl;			// <letStatement>
+		writeKeyword(J->tokenString[tokenCount]);				// <keyword> let
 		++tokenCount;
-		writeIdentifier(J->tokenString[tokenCount]);
+		writeIdentifier(J->tokenString[tokenCount]);			// <identifier> varName
 		++tokenCount;
-		if (J->tokenString[tokenCount] == "[")
+		if (J->tokenString[tokenCount] == "[")					// if array, print the array notation
 		{
-			writeSymbol(J->tokenString[tokenCount]);
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> [
 			++tokenCount;
-			CompileExpression();
-			writeSymbol(J->tokenString[tokenCount]);
+			CompileExpression();								// print the expression
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
 			++tokenCount;
 		}
 		else;
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);				// if no array, print <symbol> =
 		++tokenCount;
-		CompileExpression();
-		writeSymbol(J->tokenString[tokenCount]);
+		CompileExpression();									// print the expression		
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
 		++tokenCount;
-		outputFileStream << "</letStatement>" << endl;
+		outputFileStream << "</letStatement>" << endl;			// </letStatement>
 	}
 	void CompileWhile()
 	{
-		outputFileStream << "<whileStatement>" << endl;
-		writeKeyword(J->tokenString[tokenCount]);
+		outputFileStream << "<whileStatement>" << endl;			// <whileStatement>
+		writeKeyword(J->tokenString[tokenCount]);				// <keyword> while
 		++tokenCount;
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> (
 		++tokenCount;
-		CompileExpression();
-		writeSymbol(J->tokenString[tokenCount]);
+		CompileExpression();									// print the expression
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> )
 		++tokenCount;
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> {
 		++tokenCount;
-		CompileStatements();
+		CompileStatements();									// print the statements
+		//++tokenCount;
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> }
 		++tokenCount;
-		writeSymbol(J->tokenString[tokenCount]);
-		++tokenCount;
-		outputFileStream << "</whileStatement>" << endl;
+		outputFileStream << "</whileStatement>" << endl;		// </whileStatements>
 	}
 	void CompileReturn()
 	{
-		outputFileStream << "<returnStatement>" << endl;
-		writeKeyword(J->tokenString[tokenCount]);
+		outputFileStream << "<returnStatement>" << endl;		// <returnStatement>
+		writeKeyword(J->tokenString[tokenCount]);				// <keyword> return
 		++tokenCount;
-		if (J->tokenString[tokenCount] == ";")
+		if (J->tokenString[tokenCount] == ";")					// if no return expression, do nothing
 		{
 
 		}
 		else 
 		{
-			CompileExpression();
-			++tokenCount;
+			CompileExpression();								// otherwise, print the expression			
+			++tokenCount;	
 		}
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
 		++tokenCount;
-		outputFileStream << "</returnStatement>" << endl;
+		outputFileStream << "</returnStatement>" << endl;		// </returnStatement>
 	}
 	void CompileIf()
 	{
-		outputFileStream << "<ifStatement>" << endl;
-		writeKeyword(J->tokenString[tokenCount]);
+		outputFileStream << "<ifStatement>" << endl;			// <ifStatement>
+		writeKeyword(J->tokenString[tokenCount]);				// <keyword> if
 		++tokenCount;
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> (
 		++tokenCount;
-		CompileExpression();
-		writeSymbol(J->tokenString[tokenCount]);
+		CompileExpression();									// print the expression
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> )
 		++tokenCount;
-		writeSymbol(J->tokenString[tokenCount]);
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> {
 		++tokenCount;
-		CompileStatements();
+		CompileStatements();									// print the statements
+		writeSymbol(J->tokenString[tokenCount]);				// <symbol> }
 		++tokenCount;
-		if (J->tokenString[tokenCount] == "else")
+		if (J->tokenString[tokenCount] == "else")				// if there is an else block, print it
 		{
-			writeKeyword(J->tokenString[tokenCount]);
+			writeKeyword(J->tokenString[tokenCount]);			// <keyword> else
 			++tokenCount;
-			writeSymbol(J->tokenString[tokenCount]);
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> {
 			++tokenCount;
-			CompileStatements();
-			writeSymbol(J->tokenString[tokenCount]);
+			CompileStatements();								// print the statements
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> }
 			++tokenCount;
 		}
 		else;
-		outputFileStream << "</ifStatement>" << endl;
+		outputFileStream << "</ifStatement>" << endl;			// </ifStatement>
 	}
 	void CompileExpression()
 	{
-		outputFileStream << "<expression>" << endl;
+		outputFileStream << "<expression>" << endl;				// <expression>
+		CompileTerm();											// Print the term
+		outputFileStream << "</expression>" << endl;
 	}
 	void CompileTerm()
 	{
 		outputFileStream << "<term>" << endl;
+		while ((J->tokenString[tokenCount] != ")") && (J->tokenString[tokenCount] != ";") && (J->tokenString[tokenCount] != "]"))
+		{
+
+			if (J->tokenList[tokenCount] == INT_CONST)				// integer constant case
+			{
+				++tokenCount;
+				writeIntConst(J->tokenString[tokenCount]);			// <integerConst> 
+				++tokenCount;
+				writeSymbol(J->tokenString[tokenCount]);			// <symbol> "op"
+				++tokenCount;
+			}
+			else if (J->tokenList[tokenCount] == STRING_CONST)		// string constant case
+			{
+				writeStringConst(J->tokenString[tokenCount]);			// <stringConst> 
+				++tokenCount;
+				writeSymbol(J->tokenString[tokenCount]);			// <symbol> "op"
+				++tokenCount;
+			}
+			else if (J->tokenList[tokenCount] == KEYWORD)			// keyword constant case
+			{
+				writeKeyword(J->tokenString[tokenCount]);			// <keyword> 
+				++tokenCount;
+				writeSymbol(J->tokenString[tokenCount]);			// <symbol> "op"
+				++tokenCount;
+			}
+			else if (J->tokenList[tokenCount] == SYMBOL)			// Unary op case/expression
+			{
+				if (J->tokenString[tokenCount] == "(")				// expression
+				{
+					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
+					++tokenCount;
+					CompileExpression();								// print expression
+					writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
+					++tokenCount;
+				}
+				else
+				{
+					writeSymbol(J->tokenString[tokenCount]);			// <symbol> "unary op"
+					++tokenCount;
+					CompileTerm();										// unary op term
+					//++tokenCount;
+				}
+			}
+			else
+			{
+				// varName/subroutine
+				writeIdentifier(J->tokenString[tokenCount]);			// <keyword> 
+				++tokenCount;
+				if (J->tokenString[tokenCount] == "(")					// subroutine call
+				{
+					writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName/className/varName
+					++tokenCount;
+					if (J->tokenString[tokenCount] == "(")
+					{
+						writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
+						++tokenCount;
+						CompileExpressionList();							// calls expression list
+						writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
+						++tokenCount;
+					}
+					else
+					{
+						writeSymbol(J->tokenString[tokenCount]);			// <symbol> .
+						++tokenCount;
+						writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
+						++tokenCount;
+						writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
+						++tokenCount;
+						CompileExpressionList();							// calls expression list
+						writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
+						++tokenCount;
+					}
+				}
+				else if (J->tokenString[tokenCount] == "[")				// array
+				{
+					writeSymbol(J->tokenString[tokenCount]);		// <symbol> [
+					++tokenCount;
+					CompileExpression();							// print expression
+					writeSymbol(J->tokenString[tokenCount]);		// <symbol> ]
+					++tokenCount;
+				}
+				else {}
+			}
+		} 
+		outputFileStream << "</term>" << endl;
 	}
 	void CompileExpressionList()
 	{
 		outputFileStream << "<expressionlist>" << endl;
+		CompileExpression();
+		while (J->tokenString[tokenCount] == ",")
+		{
+			writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
+			++tokenCount;
+			CompileExpression();
+			++tokenCount;
+		}
+		outputFileStream << "</expressionlist>" << endl;
 	}
 	void writeKeyword(string input)
 	{
