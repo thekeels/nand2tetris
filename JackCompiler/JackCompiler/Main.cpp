@@ -20,17 +20,15 @@ class JackTokenizer
 	ifstream inputFileStream;
 	size_t firstCharacter;
 	vector<char> tokens;
-	
-	//	size_t lastCharacter;
 
 public:
 	vector<string> tokenString;
 	vector<tokenType> tokenList;
-	string argument1;// arg2;
+	string argument1;
 	int argument2, argument3;
 	string currentCommand;
 	string token;
-	//	string destField, compField, jumpField;
+
 	JackTokenizer() {}
 	JackTokenizer(string filename) : inputFileName(filename)
 	{
@@ -49,7 +47,6 @@ public:
 		cout << "Destroying Tokenizer" << endl;
 		inputFileStream.close();
 	}
-
 	bool hasMoreCommands()
 	{
 		if (inputFileStream.eof())
@@ -58,9 +55,7 @@ public:
 			return true;
 	}
 	void advance()
-
 	{
-
 		if (!inputFileStream.eof())
 		{
 			getline(inputFileStream, currentCommand);
@@ -89,26 +84,18 @@ public:
 
 			}
 			currentCommand = currentCommand.substr(0, currentCommand.find("//"));
-			// currentCommand = currentCommand.substr(0, currentCommand.find("/*"));
-
-
 			size_t lastCharacter = currentCommand.find_last_not_of(" \t\r\n");
 			size_t firstCharacter = currentCommand.find_first_not_of(" \t\r\n");
 
 			if (string::npos != firstCharacter) {
-				// currentCommand.substr(firstCharacter, lastCharacter - firstCharacter);
 				size_t range = lastCharacter - firstCharacter + 1;
 				currentCommand = currentCommand.substr(firstCharacter, range);
 			}
 			else return;
-			//size_t keywordPosition = currentCommand.find_first_of(" ");
-			//token = currentCommand.substr(firstCharacter, keywordPosition - 1);
 			istringstream iss(currentCommand);
 			istreambuf_iterator<char>eos;
 			istreambuf_iterator<char>itt(iss);
 			string test;
-			//istream_iterator<string> eos;
-			//istream_iterator<string> itt(iss);
 			while (itt != eos)
 			{ 
 				while ((*itt != ' ') && (*itt != '{') && (*itt != '(') && (*itt != '=') && (*itt != '}') && (*itt != ')') && (*itt != ';') && (*itt != ',') && (*itt != '[') && (*itt != ']') && (*itt != '-') && (*itt != '+') && (*itt != '*') && (*itt != '|') && (*itt != '/') && (*itt != '.') && (*itt != '&') && (*itt != '<') && (*itt != '>') && (*itt != '~'))
@@ -145,21 +132,15 @@ public:
 				}
 				tokens.clear();
 				++itt;
-
-				
 			}
-			//tokens = { istream_iterator<string>{iss},istream_iterator<string>{} };
-
 		}
 		else
 			cout << "Reached end of file.." << endl;
 		return;
 	}
 
-
 	tokenType tokenType(int j)
 	{
-		//firstCharacter = currentCommand.find_first_not_of(" \t\r\n");
 		if (tokenString[j].empty())
 		{
 			return TOKEN_NULL;
@@ -185,17 +166,13 @@ public:
 			else return IDENTIFIER;
 		}
 	}
-
-
 };
 
 class TokenWriter
 {
-
 	string outputFileNameT;
 	ofstream outputFileStreamT;
 
-	//
 public:
 	string staticVariable;
 	TokenWriter() {}
@@ -219,7 +196,6 @@ public:
 	}
 	void writeHeader()
 	{
-		// outputFileStreamT << "<?xml version=\"1.0\"?>" << endl;
 		outputFileStreamT << "<tokens>" << endl;
 		return;
 	}
@@ -270,7 +246,6 @@ class CompilationEngine : public JackTokenizer
 	string outputFileName;
 	ofstream outputFileStream;
 
-	//
 public:
 	int tokenCount = 0;
 	JackTokenizer* J;
@@ -312,7 +287,6 @@ public:
 		++tokenCount;
 		outputFileStream << "</class>" << endl;			// </class>
 	}
-
 	void CompileClassVarDec()
 	{
 		outputFileStream << "<classVarDec>" << endl;	// <classVarDec>
@@ -606,46 +580,37 @@ public:
 	}
 	void CompileTerm()
 	{
+		outputFileStream << "<term>" << endl;
 			if (J->tokenList[tokenCount] == INT_CONST)				// integer constant case
 			{
-				outputFileStream << "<term>" << endl;
 				writeIntConst(J->tokenString[tokenCount]);			// <integerConst> 
 				++tokenCount;
-				outputFileStream << "</term>" << endl;
 			}
 			else if (J->tokenList[tokenCount] == STRING_CONST)		// string constant case
 			{
-				outputFileStream << "<term>" << endl;
 				writeStringConst(J->tokenString[tokenCount]);			// <stringConst> 
 				++tokenCount;
-				outputFileStream << "</term>" << endl;
 			}
 			else if (J->tokenList[tokenCount] == KEYWORD)			// keyword constant case
 			{
-				outputFileStream << "<term>" << endl;
 				writeKeyword(J->tokenString[tokenCount]);			// <keyword> 
 				++tokenCount;
-				outputFileStream << "</term>" << endl;
 			}
 			else if (J->tokenList[tokenCount] == SYMBOL)			// Unary op case/expression
 			{
 				if (J->tokenString[tokenCount] == "(")				// expression
 				{
-					outputFileStream << "<term>" << endl;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 					++tokenCount;
 					CompileExpression();								// print expression
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 					++tokenCount;
-					outputFileStream << "</term>" << endl;
 				}
 				else if ((J->tokenString[tokenCount] == "-")|| (J->tokenString[tokenCount] == "~"))				// "-" or "~" unary op
 				{
-					outputFileStream << "<term>" << endl;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> "unary op"
 					++tokenCount;
 					CompileTerm();										// unary op term
-					outputFileStream << "</term>" << endl;
 				}
 				else
 				{
@@ -654,8 +619,6 @@ public:
 			}
 			else
 			{
-				// varName/subroutine
-				outputFileStream << "<term>" << endl;
 				writeIdentifier(J->tokenString[tokenCount]);			// <identifier> varName 
 				++tokenCount;
 				if (J->tokenString[tokenCount] == "(")					// subroutine call
@@ -705,9 +668,8 @@ public:
 					++tokenCount;
 				}
 				else {}
-				outputFileStream << "</term>" << endl;
 			}
-
+			outputFileStream << "</term>" << endl;
 	}
 	void CompileExpressionList()
 	{
@@ -765,7 +727,6 @@ public:
 };
 
 
-
 int main(int argc, const char *argv[])  // alternatively: int main(int argc, char** argv)
 										// argc = number of strings pointed to by argv
 										// argv holds the array of inputs to the program, argv[0] holds "Assembler", argv[1] holds command line input
@@ -776,9 +737,6 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		cout << "You must input a single jack file (.jack) or a directory containing multiple jack files!" << endl;
 		return 1;
 	}
-	//int instructionCounter = 0;
-	//int currentSymbolAddress = 0;
-	//int symbolCounter = 16;
 
 	string filename(argv[1]);
 	string inputFileName, asmFileName;
@@ -786,8 +744,6 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 	vector<string> fileList;
 	_finddata_t data;
 	size_t last_slash_idx = filename.find_last_of("\\/");
-	//size_t fileStartPos = filename.find_last_of("/\\");
-	// CODE to check -- is input a directory or single .vm file?
 	if (filename.find(".jack") != string::npos)
 	{
 		const size_t backslashIndex = filename.rfind('\\');
@@ -795,9 +751,6 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		fileLocation.erase(backslashIndex + 1);
 		bool directoryCheck = false;
 		filename.erase(0, last_slash_idx + 1);
-		//const size_t period_idx = filename.rfind('.'); // Remove extension if present.
-		//filename.erase(period_idx);
-		//inputFileName = (filename.substr(last_slash_idx+1, filename.find(".vm")));
 		fileList.push_back(filename);
 		asmFileName = filename;
 	}
@@ -840,9 +793,6 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		cout << "No .jack files were located. Exiting..." << endl;
 		return 0;
 	}
-
-	
-//	TokenWriter TokenWriter(fileLocation, asmFileName);
 	string fileNameCurrent;
 	for (int i = 0; i < fileList.size(); i++) {
 		fileNameCurrent = fileLocation + fileList[i];
@@ -851,7 +801,6 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 		JackTokenizer JackTokenizer(fileNameCurrent);
 		while (JackTokenizer.hasMoreCommands())
 		{
-			//	currentCode = "";
 			JackTokenizer.advance();
 		}
 		for (int j = 0; j < JackTokenizer.tokenString.size(); j++)
@@ -885,22 +834,16 @@ int main(int argc, const char *argv[])  // alternatively: int main(int argc, cha
 					TokenWriter.writeIntConst(JackTokenizer.tokenString[j]);
 					JackTokenizer.tokenList.push_back(currentTokenType);
 				}
-				
 				else;
 			}
-			
-
 		}
 		TokenWriter.writeFooter();
 		TokenWriter.Close();
-		
 		CompilationEngine CompilationEngine(fileLocation, fileList[i], JackTokenizer);
 		CompilationEngine.tokenCount = 0;
 		CompilationEngine.CompileClass();
 		CompilationEngine.Close();
 	}
-
-
 	return 0;
 }
 
