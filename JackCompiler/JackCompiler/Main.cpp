@@ -9,7 +9,7 @@
 
 #include <io.h>
 using namespace std;
-enum varType { STATIC, FIELD, ARG, VAR, NONE };
+enum varType { STATIC, FIELD, ARG, VAR, NONE,CLASS, SUBROUTINE};
 enum tokenType { KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST, TOKEN_NULL, TOKEN_ERROR};
 // 0 = KEYWORD, 1= SYMBOL, 2 = IDENTIFIER, 3 = INT_CONST, 4 = STRING_CONST
 
@@ -253,8 +253,16 @@ class SymbolTable
 	int staticCounterC, argCounterC, varCounterC, fieldCounterC = 0; // Counters for class identifiers
 	int staticCounterM, argCounterM, varCounterM, fieldCounterM = 0; // Counters for method identifiers
 
-public:
 
+public:
+	string printbeingDefined;
+	string printCategory;
+	bool inSubroutine = false; // false = class-scope, true = method-scope 
+	bool beingDefined = false; // false = var being used, true = var being defined
+	bool global = false;
+	varType currentKind = NONE;
+	string currentTypeOf = "";
+	varType currentCategory = NONE;
 	SymbolTable() {}
 	void startSubroutine() 
 	{
@@ -262,25 +270,295 @@ public:
 		typeColMethod.clear();
 		kindColMethod.clear();
 		indexColMethod.clear();
+		inSubroutine = true;
+		int staticCounterM, argCounterM, varCounterM, fieldCounterM = 0; // Counters for method identifiers
 		return;
 	}
-	void Define(string name, string type, varType kind) {}
-	int VarCount(varType kind)
+	void checkDefined(string name)
 	{
-		if (kind == STATIC)
+		global = false;
+		if (inSubroutine)
 		{
-			return staticCounterC;
+			if (std::find(nameColMethod.begin(), nameColMethod.end(), name) != nameColMethod.end())
+			{
+				// Element in vector.
+				beingDefined = false;
+			}
+			else if (std::find(nameColClass.begin(), nameColClass.end(), name) != nameColClass.end())
+			{
+				// Element in vector.
+				beingDefined = false;
+				global = true;
+			}
+			else beingDefined = true;
+		}
+		else
+		{
+			if (std::find(nameColClass.begin(), nameColClass.end(), name) != nameColClass.end())
+			{
+				// Element in vector.
+				beingDefined = false;
+			}
+			else beingDefined = true;
+		}
+		if (beingDefined)
+		{
+			printbeingDefined = "beingDefined";
+		}
+		else
+		{
+			printbeingDefined = "beingUsed";
+		}
+		return;
+	}
+	string PrintCategory(string name)
+	{
+		int pos = findIndex(name);
+		varType posCategory;
+		string printCategory;
+		if (inSubroutine && !global)
+		{
+			posCategory = kindColMethod[pos];
+		}
+		else
+		{
+			posCategory = kindColClass[pos];
+		}
+		if (posCategory == VAR)
+		{
+			printCategory = "VAR";
+		}
+		else if (posCategory == STATIC)
+		{
+			printCategory = "STATIC";
+		}
+		else if (posCategory == ARG)
+		{
+			printCategory = "ARG";
+		}
+		else if (posCategory == FIELD)
+		{
+			printCategory = "FIELD";
+		}
+		else if (posCategory == CLASS)
+		{
+			printCategory = "CLASS";
+		}
+		else if (posCategory == SUBROUTINE)
+		{
+			printCategory = "SUBROUTINE";
+		}
+		else
+		{
+			printCategory = "unknown";
+		}
+		return printCategory;
+	}
+	int findIndex(string name)
+	{
+		vector<string>::iterator indexReturn;
+		int pos;
+		if (inSubroutine && !global)
+		{
+			indexReturn = std::find(nameColMethod.begin(), nameColMethod.end(), name);
+			pos = distance(nameColMethod.begin(), indexReturn);
+			return pos;
+		}
+		else
+		{
+			indexReturn = std::find(nameColClass.begin(), nameColClass.end(), name);
+			pos = distance(nameColClass.begin(), indexReturn);
+			return pos;
+		}
+	}
+	void Define(string name, string type, varType kind) 
+	{
+		if (kind == VAR)
+		{
+			if (inSubroutine)
+			{
+				indexColMethod.push_back(IndexOf(name));
+				nameColMethod.push_back(name);
+				typeColMethod.push_back(type);
+				kindColMethod.push_back(kind);
+				++varCounterM;
+			}
+			else
+			{
+				indexColClass.push_back(IndexOf(name));
+				nameColClass.push_back(name);
+				typeColClass.push_back(type);
+				kindColClass.push_back(kind);
+				++varCounterC;
+			}
+		}
+		else if (kind == STATIC)
+		{
+			if (inSubroutine)
+			{
+				indexColMethod.push_back(IndexOf(name));
+				nameColMethod.push_back(name);
+				typeColMethod.push_back(type);
+				kindColMethod.push_back(kind);
+				++staticCounterM;
+			}
+			else
+			{
+				indexColClass.push_back(IndexOf(name));
+				nameColClass.push_back(name);
+				typeColClass.push_back(type);
+				kindColClass.push_back(kind);
+				++staticCounterC;
+			}
+		}
+		else if (kind == ARG)
+		{
+			if (inSubroutine)
+			{
+				indexColMethod.push_back(IndexOf(name));
+				nameColMethod.push_back(name);
+				typeColMethod.push_back(type);
+				kindColMethod.push_back(kind);
+				++argCounterM;
+			}
+			else
+			{
+				indexColClass.push_back(IndexOf(name));
+				nameColClass.push_back(name);
+				typeColClass.push_back(type);
+				kindColClass.push_back(kind);
+				++argCounterC;
+			}
 		}
 		else if (kind == FIELD)
-			return fieldCounterC;
-		else if (kind == VAR)
-			return varCounterC;
-		else if (kind == ARG)
-			return argCounterC;
+		{
+			if (inSubroutine)
+			{
+				indexColMethod.push_back(IndexOf(name));
+				nameColMethod.push_back(name);
+				typeColMethod.push_back(type);
+				kindColMethod.push_back(kind);
+				++fieldCounterM;
+			}
+			else
+			{
+				indexColClass.push_back(IndexOf(name));
+				nameColClass.push_back(name);
+				typeColClass.push_back(type);
+				kindColClass.push_back(kind);
+				++fieldCounterC;
+			}
+		}
+		else if (kind == CLASS)
+		{
+			if (inSubroutine)
+			{
+				indexColMethod.push_back(IndexOf(name));
+				nameColMethod.push_back(name);
+				typeColMethod.push_back(type);
+				kindColMethod.push_back(kind);
+			}
+			else
+			{
+				indexColClass.push_back(IndexOf(name));
+				nameColClass.push_back(name);
+				typeColClass.push_back(type);
+				kindColClass.push_back(kind);
+			}
+		}
+		else if (kind == SUBROUTINE)
+		{
+			if (inSubroutine)
+			{
+				indexColMethod.push_back(IndexOf(name));
+				nameColMethod.push_back(name);
+				typeColMethod.push_back(type);
+				kindColMethod.push_back(kind);
+			}
+			else
+			{
+				indexColClass.push_back(IndexOf(name));
+				nameColClass.push_back(name);
+				typeColClass.push_back(type);
+				kindColClass.push_back(kind);
+			}
+		}
+		return;
+
+
 	}
-	varType KindOf(string name) {}
-	string TypeOf(string name) {}
-	int IndexOf(string name) {}
+	int VarCount(varType kind)
+	{
+		if (inSubroutine)
+		{
+			if (kind == STATIC)
+			{
+				return staticCounterM;
+			}
+			else if (kind == FIELD)
+				return fieldCounterM;
+			else if (kind == VAR)
+				return varCounterM;
+			else if (kind == ARG)
+				return argCounterM;
+		}
+		else
+		{
+			if (kind == STATIC)
+			{
+				return staticCounterC;
+			}
+			else if (kind == FIELD)
+				return fieldCounterC;
+			else if (kind == VAR)
+				return varCounterC;
+			else if (kind == ARG)
+				return argCounterC;
+		}
+	}
+	varType KindOf(string name) 
+	{
+		int pos = findIndex(name);
+		varType posKind;
+
+		if (inSubroutine && !global)
+		{
+			posKind = kindColMethod[pos];
+		}
+		else
+		{
+			posKind = kindColClass[pos];
+		}
+		
+		return posKind;
+	}
+	string TypeOf(string name) 
+	{
+		return currentTypeOf;
+	}
+	int IndexOf(string name)
+	{
+		int pos = findIndex(name);
+		int posIndex;
+
+		if (inSubroutine && !global)
+		{
+			if (find(nameColMethod.begin(), nameColMethod.end(), name) != nameColMethod.end())
+			{
+				posIndex = indexColMethod[pos];
+			}
+			else posIndex = 0;
+		}
+		else
+		{
+			if (find(nameColClass.begin(), nameColClass.end(), name) != nameColClass.end())
+			{
+				posIndex = indexColClass[pos];
+			}
+			else posIndex = 0;
+		}
+		return posIndex;
+	}
 	~SymbolTable() {}
 
 
@@ -316,9 +594,23 @@ public:
 	{
 		outputFileStream << "<class>" << endl;			// <class>
 		writeKeyword(J->tokenString[tokenCount]);		// <keyword> class
-		++tokenCount;				
+		++tokenCount;			
+		// CLASS symbol table state definition
+		symbolTable.currentKind = CLASS;
+		symbolTable.currentTypeOf = "class";
+		symbolTable.checkDefined(J->tokenString[tokenCount]);
+		// end CLASS symbol table state definition
 		writeIdentifier(J->tokenString[tokenCount]);	// <identifier> Main
+		{
+			if (symbolTable.beingDefined)
+			{
+				symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+			}
+			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+
+		}
 		++tokenCount;
+
 		writeSymbol(J->tokenString[tokenCount]);		// <symbol> ;
 		++tokenCount;
 		while ((J->tokenString[tokenCount] == "static") || (J->tokenString[tokenCount] == "field"))
@@ -337,6 +629,10 @@ public:
 	{
 		outputFileStream << "<classVarDec>" << endl;	// <classVarDec>
 		writeKeyword(J->tokenString[tokenCount]);		// "<keyword> static " || "<keyword field "
+		// class var kind definition
+		if (J->tokenString[tokenCount] == "static") { symbolTable.currentKind = STATIC; }
+		else symbolTable.currentKind = FIELD;
+		// end class var kind definition
 		++tokenCount;
 		if (J->tokenList[tokenCount] == KEYWORD)
 		{
@@ -345,15 +641,45 @@ public:
 		else
 		{
 			writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
+			// CLASS symbol table state definition
+			symbolTable.currentTypeOf = J->tokenString[tokenCount];
+			symbolTable.currentCategory = CLASS;
+			symbolTable.checkDefined(J->tokenString[tokenCount]);
+			if (symbolTable.beingDefined)
+			{
+				symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+			}
+			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+			// end CLASS symbol table state definition
 		}
 		++tokenCount;
 		writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
+		// CLASS symbol table state definition
+		symbolTable.currentTypeOf = J->tokenString[tokenCount-1];
+		symbolTable.currentCategory = symbolTable.currentKind;
+		symbolTable.checkDefined(J->tokenString[tokenCount]);
+		if (symbolTable.beingDefined)
+		{
+			symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+		}
+		outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+		// end CLASS symbol table state definition
 		++tokenCount;
 		while (J->tokenString[tokenCount] == ",")
 		{
 			writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
 			++tokenCount;
 			writeIdentifier(J->tokenString[tokenCount]);	// prints remaining varNames, if they exist
+			// CLASS symbol table state definition
+			//symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+			//symbolTable.currentCategory = symbolTable.currentKind;
+			//symbolTable.checkDefined(J->tokenString[tokenCount]);
+			if (symbolTable.beingDefined)
+			{
+				symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+			}
+			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+			// end CLASS symbol table state definition
 			++tokenCount;
 		}
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> ;
@@ -362,6 +688,7 @@ public:
 	}
 	void CompileSubroutine()
 	{
+		symbolTable.startSubroutine();
 		outputFileStream << "<subroutineDec>" << endl;		// <subroutineDec>
 		writeKeyword(J->tokenString[tokenCount]);			// <keyword> constructor/method/function
 		++tokenCount;
@@ -372,9 +699,31 @@ public:
 		else
 		{
 			writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
+			// SUBROUTINE symbol table state definition
+			symbolTable.currentKind = CLASS;
+			symbolTable.currentTypeOf = J->tokenString[tokenCount];
+			symbolTable.currentCategory = symbolTable.currentKind;
+			symbolTable.checkDefined(J->tokenString[tokenCount]);
+			if (symbolTable.beingDefined)
+			{
+				symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+			}
+			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+			// end SUBROUTINE symbol table state definition
 		}
 		++tokenCount;
 		writeIdentifier(J->tokenString[tokenCount]);		// <identifier> subroutineName
+		// SUBROUTINE symbol table state definition
+		symbolTable.currentKind = SUBROUTINE;
+		symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+		symbolTable.currentCategory = symbolTable.currentKind;
+		symbolTable.checkDefined(J->tokenString[tokenCount]);
+		if (symbolTable.beingDefined)
+		{
+			symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+		}
+		outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+		// end SUBROUTINE symbol table state definition
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 		++tokenCount;
@@ -393,6 +742,7 @@ public:
 		++tokenCount;
 		outputFileStream << "</subroutineBody>" << endl;	// </subroutineBody>
 		outputFileStream << "</subroutineDec>" << endl;		// </subroutineDec>
+		symbolTable.inSubroutine = false;
 	}
 	void CompileParameterList()
 	{
@@ -410,9 +760,31 @@ public:
 			else
 			{
 				writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
+				// Symbol table state definition
+				symbolTable.currentKind = SUBROUTINE;
+				symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+				symbolTable.currentCategory = symbolTable.currentKind;
+				symbolTable.checkDefined(J->tokenString[tokenCount]);
+				if (symbolTable.beingDefined)
+				{
+					symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+				}
+				outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+				// End symbol table state definition
 			}
 			++tokenCount;
 			writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
+			// Symbol table state definition
+			symbolTable.currentKind = ARG;
+			symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+			symbolTable.currentCategory = symbolTable.currentKind;
+			symbolTable.checkDefined(J->tokenString[tokenCount]);
+			if (symbolTable.beingDefined)
+			{
+				symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+			}
+			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+			// End symbol table state definition
 			++tokenCount;
 			while (J->tokenString[tokenCount] == ",")
 			{
@@ -425,9 +797,31 @@ public:
 				else
 				{
 					writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
+					// Symbol table state definition
+					symbolTable.currentKind = SUBROUTINE;
+					symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+					symbolTable.currentCategory = symbolTable.currentKind;
+					symbolTable.checkDefined(J->tokenString[tokenCount]);
+					if (symbolTable.beingDefined)
+					{
+						symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+					}
+					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+					// End symbol table state definition
 				}
 				++tokenCount;
 				writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
+				// Symbol table state definition
+				symbolTable.currentKind = ARG;
+				symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+				symbolTable.currentCategory = symbolTable.currentKind;
+				symbolTable.checkDefined(J->tokenString[tokenCount]);
+				if (symbolTable.beingDefined)
+				{
+					symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+				}
+				outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+				// End symbol table state definition
 				++tokenCount;
 			}
 		}
@@ -438,6 +832,11 @@ public:
 		outputFileStream << "<varDec>" << endl;
 		writeKeyword(J->tokenString[tokenCount]);				// <keyword> var
 		++tokenCount;
+		// SUBROUTINE symbol table state definition
+		symbolTable.currentKind = VAR;
+		symbolTable.currentTypeOf = J->tokenString[tokenCount];
+		symbolTable.checkDefined(J->tokenString[tokenCount]);
+		// end SUBROUTINE symbol table state definition
 		if (J->tokenList[tokenCount] == KEYWORD)
 		{
 			writeKeyword(J->tokenString[tokenCount]);		// prints <keyword> int/char/boolean
@@ -445,15 +844,48 @@ public:
 		else
 		{
 			writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
+			// Symbol table state definition
+			symbolTable.currentKind = VAR;
+			symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+			symbolTable.currentCategory = symbolTable.currentKind;
+			symbolTable.checkDefined(J->tokenString[tokenCount]);
+			if (symbolTable.beingDefined)
+			{
+				symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+			}
+			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+			// End symbol table state definition
 		}
 		++tokenCount;
 		writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
+		// Symbol table state definition
+		symbolTable.currentKind = VAR;
+		symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+		symbolTable.currentCategory = symbolTable.currentKind;
+		symbolTable.checkDefined(J->tokenString[tokenCount]);
+		if (symbolTable.beingDefined)
+		{
+			symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+		}
+		outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+		// End symbol table state definition
 		++tokenCount;
 		while (J->tokenString[tokenCount] == ",")
 		{
 			writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
 			++tokenCount;
 			writeIdentifier(J->tokenString[tokenCount]);	// prints remaining varNames, if they exist
+			// Symbol table state definition
+			//symbolTable.currentKind = VAR;
+			//symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+			//symbolTable.currentCategory = symbolTable.currentKind;
+			//symbolTable.checkDefined(J->tokenString[tokenCount]);
+			if (symbolTable.beingDefined)
+			{
+				symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+			}
+			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+			// End symbol table state definition
 			++tokenCount;
 		}
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> ;
@@ -495,6 +927,22 @@ public:
 		writeKeyword(J->tokenString[tokenCount]);			// <keyword> do
 		++tokenCount;
 		writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName/className/varName
+		// Symbol table state definition
+		symbolTable.checkDefined(J->tokenString[tokenCount]);
+		if(J->tokenString[tokenCount+1] == ".")
+		{ 
+			symbolTable.currentKind = CLASS;
+		}
+		else symbolTable.currentKind = SUBROUTINE;
+		symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+		symbolTable.currentCategory = symbolTable.currentKind;
+
+		if (symbolTable.beingDefined)
+		{
+			symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+		}
+		outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+		// End symbol table state definition
 		++tokenCount;
 		if (J->tokenString[tokenCount] == "(")
 		{
@@ -509,6 +957,17 @@ public:
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> .
 			++tokenCount;
 			writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
+			// Symbol table state definition
+			symbolTable.currentKind = SUBROUTINE;
+			symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+			symbolTable.currentCategory = symbolTable.currentKind;
+			symbolTable.checkDefined(J->tokenString[tokenCount]);
+			if (symbolTable.beingDefined)
+			{
+				symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+			}
+			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+			// End symbol table state definition
 			++tokenCount;
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 			++tokenCount;
@@ -526,6 +985,17 @@ public:
 		writeKeyword(J->tokenString[tokenCount]);				// <keyword> let
 		++tokenCount;
 		writeIdentifier(J->tokenString[tokenCount]);			// <identifier> varName
+		// Symbol table state definition
+		symbolTable.currentKind = VAR;
+		symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+		symbolTable.currentCategory = symbolTable.currentKind;
+		symbolTable.checkDefined(J->tokenString[tokenCount]);
+		if (symbolTable.beingDefined)
+		{
+			symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+		}
+		outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+		// End symbol table state definition
 		++tokenCount;
 		if (J->tokenString[tokenCount] == "[")					// if array, print the array notation
 		{
@@ -666,10 +1136,32 @@ public:
 			else
 			{
 				writeIdentifier(J->tokenString[tokenCount]);			// <identifier> varName 
+				// Symbol table state definition
+				symbolTable.currentKind = VAR;
+				symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+				symbolTable.currentCategory = symbolTable.currentKind;
+				symbolTable.checkDefined(J->tokenString[tokenCount]);
+				if (symbolTable.beingDefined)
+				{
+					symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+				}
+				outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+				// End symbol table state definition
 				++tokenCount;
 				if (J->tokenString[tokenCount] == "(")					// subroutine call
 				{
 					writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName/className/varName
+					// Symbol table state definition
+					symbolTable.currentKind = VAR;
+					symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+					symbolTable.currentCategory = symbolTable.currentKind;
+					symbolTable.checkDefined(J->tokenString[tokenCount]);
+					if (symbolTable.beingDefined)
+					{
+						symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+					}
+					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+					// End symbol table state definition
 					++tokenCount;
 					if (J->tokenString[tokenCount] == "(")
 					{
@@ -684,6 +1176,17 @@ public:
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> .
 						++tokenCount;
 						writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
+						// Symbol table state definition
+						symbolTable.currentKind = SUBROUTINE;
+						symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+						symbolTable.currentCategory = symbolTable.currentKind;
+						symbolTable.checkDefined(J->tokenString[tokenCount]);
+						if (symbolTable.beingDefined)
+						{
+							symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+						}
+						outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+						// End symbol table state definition
 						++tokenCount;
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 						++tokenCount;
@@ -698,6 +1201,17 @@ public:
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> .
 					++tokenCount;
 					writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
+					// Symbol table state definition
+					symbolTable.currentKind = SUBROUTINE;
+					symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+					symbolTable.currentCategory = symbolTable.currentKind;
+					symbolTable.checkDefined(J->tokenString[tokenCount]);
+					if (symbolTable.beingDefined)
+					{
+						symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
+					}
+					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+					// End symbol table state definition
 					++tokenCount;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 					++tokenCount;
