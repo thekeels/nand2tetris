@@ -247,7 +247,7 @@ class VMWriter
 {
 	string outputFileNameVM;
 	ofstream outputFileStreamVM;
-
+	string convertedSegment;
 public:
 	//string staticVariable;
 	VMWriter() {}
@@ -269,14 +269,55 @@ public:
 		outputFileStreamVM.close();
 		return;
 	}
+	void convertSegment(segmentType segment)
+	{
+
+		if (segment == STATICseg)
+		{
+			convertedSegment = "static";
+		}
+		else if (segment == LOCALseg)
+		{
+			convertedSegment = "local";
+		}
+		else if (segment == CONSTseg)
+		{
+			convertedSegment = "constant";
+		}
+		else if (segment == ARGseg)
+		{
+			convertedSegment = "arg";
+		}
+		else if (segment == THISseg)
+		{
+			convertedSegment = "this";
+		}
+		else if (segment == THATseg)
+		{
+			convertedSegment = "that";
+		}
+		else if (segment == POINTERseg)
+		{
+			convertedSegment = "pointer";
+		}
+		else if (segment == TEMPseg)
+		{
+			convertedSegment = "temp";
+		}
+		else
+
+		return;
+	}
 	void writePush(segmentType segment, int index)
 	{
-		outputFileStreamVM << "push" << " " << segment << " " << index << endl;
+		convertSegment(segment);
+		outputFileStreamVM << "push" << " " << convertedSegment << " " << index << endl;
 		return;
 	}
 	void writePop(segmentType segment, int index)
 	{
-		outputFileStreamVM << "pop" << " " << segment << " " << index << endl;
+		convertSegment(segment);
+		outputFileStreamVM << "pop" << " " << convertedSegment << " " << index << endl;
 		return;
 	}
 	void writeArithmetic(commandType command)
