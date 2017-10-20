@@ -845,8 +845,8 @@ public:
 		{
 			writeIdentifier(J->tokenString[tokenCount]);	// prints <identifier> className
 			// Symbol table state definition
-			symbolTable.currentKind = VAR;
-			symbolTable.currentTypeOf = J->tokenString[tokenCount - 1];
+			symbolTable.currentKind = CLASS;
+			symbolTable.currentTypeOf = J->tokenString[tokenCount];
 			symbolTable.currentCategory = symbolTable.currentKind;
 			symbolTable.checkDefined(J->tokenString[tokenCount]);
 			if (symbolTable.beingDefined)

@@ -1,0 +1,81 @@
+<class>
+<keyword> class </keyword>
+<identifier> Main </identifier>
+(Main , CLASS , 0 , beingDefined)
+<symbol> { </symbol>
+<subroutineDec>
+<keyword> function </keyword>
+<keyword> void </keyword>
+<identifier> main </identifier>
+(main , SUBROUTINE , 0 , beingDefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<varDec>
+<keyword> var </keyword>
+<identifier> SquareGame </identifier>
+(SquareGame , CLASS , 0 , beingDefined)
+<identifier> game </identifier>
+(game , VAR , 0 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> game </identifier>
+(game , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> SquareGame </identifier>
+(SquareGame , CLASS , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> new </identifier>
+(new , SUBROUTINE , 0 , beingDefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> game </identifier>
+(game , VAR , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> run </identifier>
+(run , SUBROUTINE , 0 , beingDefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> game </identifier>
+(game , VAR , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> dispose </identifier>
+(dispose , SUBROUTINE , 0 , beingDefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<symbol> } </symbol>
+</class>
