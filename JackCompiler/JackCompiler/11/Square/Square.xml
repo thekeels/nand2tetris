@@ -1,0 +1,1365 @@
+<class>
+<keyword> class </keyword>
+<identifier> Square </identifier>
+(Square , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> { </symbol>
+<classVarDec>
+<keyword> field </keyword>
+<keyword> int </keyword>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingDefined)
+<symbol> , </symbol>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<classVarDec>
+<keyword> field </keyword>
+<keyword> int </keyword>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<subroutineDec>
+<keyword> constructor </keyword>
+<identifier> Square </identifier>
+(Square , CLASS , No Index , CLASS/SUB-notdefined)
+<identifier> new </identifier>
+(new , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+<keyword> int </keyword>
+<identifier> Ax </identifier>
+(Ax , ARG , 0 , beingDefined)
+<symbol> , </symbol>
+<keyword> int </keyword>
+<identifier> Ay </identifier>
+(Ay , ARG , 1 , beingDefined)
+<symbol> , </symbol>
+<keyword> int </keyword>
+<identifier> Asize </identifier>
+(Asize , ARG , 2 , beingDefined)
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Ax </identifier>
+(Ax , ARG , 0 , beingUsed)
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Ay </identifier>
+(Ay , ARG , 1 , beingUsed)
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Asize </identifier>
+(Asize , ARG , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> draw </identifier>
+(draw , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<expression>
+<term>
+<keyword> this </keyword>
+</term>
+</expression>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> dispose </identifier>
+(dispose , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Memory </identifier>
+(Memory , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> deAlloc </identifier>
+(deAlloc , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> this </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> draw </identifier>
+(draw , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> true </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> erase </identifier>
+(erase , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> false </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> incSize </identifier>
+(incSize , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> &lt; </symbol>
+<term>
+<integerConstant> 254 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> &amp; </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> &lt; </symbol>
+<term>
+<integerConstant> 510 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> erase </identifier>
+(erase , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> draw </identifier>
+(draw , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> decSize </identifier>
+(decSize , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+<symbol> &gt; </symbol>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> erase </identifier>
+(erase , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> draw </identifier>
+(draw , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> moveUp </identifier>
+(moveUp , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> &gt; </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> false </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> true </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> moveDown </identifier>
+(moveDown , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> &lt; </symbol>
+<term>
+<integerConstant> 254 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> false </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> true </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> moveLeft </identifier>
+(moveLeft , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> &gt; </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> false </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> true </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> moveRight </identifier>
+(moveRight , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> &lt; </symbol>
+<term>
+<integerConstant> 510 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> false </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> setColor </identifier>
+(setColor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> true </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> x </identifier>
+(x , FIELD , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> y </identifier>
+(y , FIELD , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> size </identifier>
+(size , FIELD , 2 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<symbol> } </symbol>
+</class>

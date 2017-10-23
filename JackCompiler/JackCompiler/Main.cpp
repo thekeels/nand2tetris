@@ -248,8 +248,10 @@ class VMWriter
 	string outputFileNameVM;
 	ofstream outputFileStreamVM;
 	string convertedSegment;
+
 public:
 	//string staticVariable;
+	segmentType currentSegment;
 	VMWriter() {}
 	VMWriter(string directory, string filename)
 	{
@@ -269,6 +271,30 @@ public:
 		outputFileStreamVM.close();
 		return;
 	}
+	void findSegment(varType segment)
+	{
+
+		if (segment == ARG)
+		{
+			currentSegment = ARGseg;
+		}
+		else if (segment == VAR)
+		{
+			currentSegment = LOCALseg;
+		}
+		else if (segment == STATIC)
+		{
+			currentSegment = STATICseg;
+		}
+		else if (segment == FIELD)
+		{
+			currentSegment = THISseg;
+		}
+
+		else
+
+			return;
+	}
 	void convertSegment(segmentType segment)
 	{
 
@@ -286,7 +312,7 @@ public:
 		}
 		else if (segment == ARGseg)
 		{
-			convertedSegment = "arg";
+			convertedSegment = "argument";
 		}
 		else if (segment == THISseg)
 		{
@@ -414,6 +440,8 @@ public:
 	string printCategory;
 	string currentClassName;
 	string currentSubName;
+	string currentFunction;
+	string currentLet;
 	bool inSubroutine = false; // false = class-scope, true = method-scope 
 	bool beingDefined = false; // false = var being used, true = var being defined
 	bool global = false;
@@ -676,7 +704,32 @@ public:
 	}
 	string TypeOf(string name) 
 	{
-		return currentTypeOf;
+		int pos = findIndex(name);
+		string typeIndex;
+		varType kind = KindOf(name);
+		if (inSubroutine && !global)
+		{
+			if (find(nameColMethod.begin(), nameColMethod.end(), name) != nameColMethod.end())
+			{
+				typeIndex = typeColMethod[pos];
+			}
+			else
+			{
+				typeIndex = "Unknown";
+			}
+		}
+		else
+		{
+			if (find(nameColClass.begin(), nameColClass.end(), name) != nameColClass.end())
+			{
+				typeIndex = typeColClass[pos];
+			}
+			else
+			{
+				typeIndex = "Unknown";
+			}
+		}
+		return typeIndex;
 	}
 	int IndexOf(string name)
 	{
@@ -750,10 +803,13 @@ class CompilationEngine : public JackTokenizer
 	ofstream outputFileStream;
 	VMWriter VMWriter;
 	string currentFileName;
+	string functionType;
+	int fieldCounter=0;
 public:
 	int tokenCount = 0;
-	int parameterCount = 0;
+	int localCount = 0;
 	JackTokenizer* J;
+	int varCount = 0;
 
 	CompilationEngine(string directory, string filename, JackTokenizer &Jack)
 	{
@@ -791,6 +847,7 @@ public:
 		{
 			CompileClassVarDec();						// Prints out all the Class Variable Definitions
 		}
+		localCount = 0;
 		while ((J->tokenString[tokenCount] == "function") || (J->tokenString[tokenCount] == "method") || (J->tokenString[tokenCount] == "constructor"))
 		{
 			CompileSubroutine();						// Moves on to print all the subroutines
@@ -805,7 +862,11 @@ public:
 		writeKeyword(J->tokenString[tokenCount]);		// "<keyword> static " || "<keyword field "
 		// class var kind definition
 		if (J->tokenString[tokenCount] == "static") { symbolTable.currentKind = varType::STATIC; }
-		else symbolTable.currentKind = FIELD;
+		else
+		{
+			symbolTable.currentKind = FIELD;
+			++fieldCounter;
+		}
 		// end class var kind definition
 		++tokenCount;
 		if (J->tokenList[tokenCount] == KEYWORD)
@@ -830,13 +891,14 @@ public:
 			symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
 		}
 		outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
-		VMWriter.writePush(STATICseg,symbolTable.IndexOf(J->tokenString[tokenCount]));
+		// VMWriter.writePush(STATICseg,symbolTable.IndexOf(J->tokenString[tokenCount]));
 		// end CLASS symbol table state definition
 		++tokenCount;
 		while (J->tokenString[tokenCount] == ",")
 		{
 			writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
 			++tokenCount;
+			++fieldCounter;
 			writeIdentifier(J->tokenString[tokenCount]);	// prints remaining varNames, if they exist
 			// CLASS symbol table state definition
 			if (symbolTable.beingDefined)
@@ -844,7 +906,7 @@ public:
 				symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
 			}
 			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
-			VMWriter.writePush(STATICseg, symbolTable.IndexOf(J->tokenString[tokenCount]));
+			//VMWriter.writePush(STATICseg, symbolTable.IndexOf(J->tokenString[tokenCount]));
 			// end CLASS symbol table state definition
 			++tokenCount;
 		}
@@ -857,6 +919,7 @@ public:
 		symbolTable.startSubroutine();
 		outputFileStream << "<subroutineDec>" << endl;		// <subroutineDec>
 		writeKeyword(J->tokenString[tokenCount]);			// <keyword> constructor/method/function
+		functionType = J->tokenString[tokenCount];
 		++tokenCount;
 		if (J->tokenList[tokenCount] == KEYWORD)
 		{
@@ -878,8 +941,8 @@ public:
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 		++tokenCount;
+		varCount = 0;
 		CompileParameterList();								// prints the Parameter List
-		VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, parameterCount);
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 		++tokenCount;
 		outputFileStream << "<subroutineBody>" << endl;		// <subroutineBody>
@@ -888,6 +951,28 @@ public:
 		while (J->tokenString[tokenCount] == "var")
 		{
 			CompileVarDec();								// prints all the VarDecs
+		}
+		if (functionType == "function")
+		{
+			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, localCount);// need fix to set localCount?
+		}
+		else if (functionType == "constructor")
+		{
+			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, localCount);
+			VMWriter.writePush(CONSTseg, fieldCounter);
+			VMWriter.writeCall("Memory.alloc", 1);
+			VMWriter.writePop(POINTERseg, 0);
+			//for (int j = 0; j < varCount; j++)
+			//{
+			//	VMWriter.writePush(ARGseg, j);
+			//	VMWriter.writePop(THISseg, j);
+			//}
+		}
+		else if (functionType == "method")
+		{
+			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, localCount);
+			VMWriter.writePush(ARGseg, 0);
+			VMWriter.writePop(POINTERseg, 0);
 		}
 		CompileStatements();								// prints all the statements
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> }			
@@ -898,7 +983,6 @@ public:
 	}
 	void CompileParameterList()
 	{
-		parameterCount = 0;
 		outputFileStream << "<parameterList>" << endl;		// <parameterList>
 		if (J->tokenString[tokenCount] == ")")
 		{
@@ -917,7 +1001,7 @@ public:
 				outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
 				// End symbol table state definition
 			}
-			++parameterCount;
+			++varCount;
 			++tokenCount;
 			writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
 			// Symbol table state definition
@@ -935,8 +1019,8 @@ public:
 			while (J->tokenString[tokenCount] == ",")
 			{
 				writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
-				++parameterCount;
 				++tokenCount;
+				++varCount;
 				if (J->tokenList[tokenCount] == KEYWORD)
 				{
 					writeKeyword(J->tokenString[tokenCount]);		// prints <keyword> int/char/boolean
@@ -988,6 +1072,7 @@ public:
 			// End symbol table state definition
 		}
 		++tokenCount;
+		++localCount;
 		writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
 		// Symbol table state definition
 		symbolTable.currentKind = VAR;
@@ -1005,6 +1090,7 @@ public:
 		{
 			writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
 			++tokenCount;
+			++localCount;
 			writeIdentifier(J->tokenString[tokenCount]);	// prints remaining varNames, if they exist
 			// Symbol table state definition
 			if (symbolTable.beingDefined)
@@ -1055,20 +1141,29 @@ public:
 		++tokenCount;
 		writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName/className/varName
 		// Symbol table state definition
+		symbolTable.currentSubName = J->tokenString[tokenCount];
 		symbolTable.checkDefined(J->tokenString[tokenCount]);
 		if (symbolTable.beingDefined)
 		{
 			if (J->tokenString[tokenCount + 1] == ".")
 			{
 				symbolTable.currentKind = CLASS;
+				symbolTable.currentSubName = J->tokenString[tokenCount];
 			}
-			else symbolTable.currentKind = SUBROUTINE;
+			else
+			{
+				symbolTable.currentKind = SUBROUTINE;
+				symbolTable.currentSubName = symbolTable.currentClassName + "." + symbolTable.currentSubName;
+			}
 			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(symbolTable.currentKind) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
+			VMWriter.writePush(POINTERseg, 0); // needs to push THIS
 		}
 		else
 		{
 			symbolTable.currentKind = symbolTable.KindOf(J->tokenString[tokenCount]);
 			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+			symbolTable.currentSubName = symbolTable.TypeOf(J->tokenString[tokenCount]);
+			VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(J->tokenString[tokenCount])); // needs to push
 		}
 		// End symbol table state definition
 		++tokenCount;
@@ -1077,6 +1172,7 @@ public:
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 			++tokenCount;
 			CompileExpressionList();							// calls expression list
+			VMWriter.writeCall(symbolTable.currentSubName, 1); // need fix for nArgs
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 			++tokenCount;
 		}
@@ -1087,6 +1183,8 @@ public:
 			writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
 			// Symbol table state definition
 			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
+			symbolTable.currentSubName = symbolTable.currentSubName + "." + J->tokenString[tokenCount];
+			VMWriter.writeCall(symbolTable.currentSubName, 1); // need fix for nArgs
 			// End symbol table state definition
 			++tokenCount;
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
@@ -1097,6 +1195,7 @@ public:
 		}
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;		
 		++tokenCount;
+		VMWriter.writePop(TEMPseg, 0);
 		outputFileStream << "</doStatement>" << endl;			// </doStatement>
 	}
 	void CompileLet()
@@ -1114,7 +1213,15 @@ public:
 		{
 			symbolTable.Define(J->tokenString[tokenCount], symbolTable.currentTypeOf, symbolTable.currentKind);
 		}
+		else
+		{
+			symbolTable.currentKind = symbolTable.KindOf(J->tokenString[tokenCount]);
+			symbolTable.currentLet = J->tokenString[tokenCount];
+
+		}
 		outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
+		varCount = symbolTable.IndexOf(J->tokenString[tokenCount]);
+		VMWriter.findSegment(symbolTable.currentKind);
 		// End symbol table state definition
 		++tokenCount;
 		if (J->tokenString[tokenCount] == "[")					// if array, print the array notation
@@ -1126,9 +1233,14 @@ public:
 			++tokenCount;
 		}
 		else;
+		
+		
 		writeSymbol(J->tokenString[tokenCount]);				// if no array, print <symbol> =
 		++tokenCount;
-		CompileExpression();									// print the expression		
+		CompileExpression();
+		symbolTable.checkDefined(symbolTable.currentLet);// print the expression
+		VMWriter.findSegment(symbolTable.KindOf(symbolTable.currentLet));
+		VMWriter.writePop(VMWriter.currentSegment, varCount);
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
 		++tokenCount;
 		outputFileStream << "</letStatement>" << endl;			// </letStatement>
@@ -1157,14 +1269,16 @@ public:
 		++tokenCount;
 		if (J->tokenString[tokenCount] == ";")					// if no return expression, do nothing
 		{
-
+			VMWriter.writePush(CONSTseg, 0);
 		}
 		else 
 		{
-			CompileExpression();								// otherwise, print the expression				
+			CompileExpression();								// otherwise, print the expression
+			VMWriter.writePush(VMWriter.currentSegment, 0); //need to verify index
 		}
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
 		++tokenCount;
+		VMWriter.writeReturn();
 		outputFileStream << "</returnStatement>" << endl;		// </returnStatement>
 	}
 	void CompileIf()
@@ -1229,7 +1343,21 @@ public:
 			}
 			else if (J->tokenList[tokenCount] == KEYWORD)			// keyword constant case
 			{
-				writeKeyword(J->tokenString[tokenCount]);			// <keyword> 
+				writeKeyword(J->tokenString[tokenCount]);			// <keyword>
+				if (J->tokenString[tokenCount] == "this")
+				{
+					VMWriter.currentSegment = POINTERseg;
+					//VMWriter.writePush(VMWriter.currentSegment, 0); // push this
+				}
+				else if (J->tokenString[tokenCount] == "that")
+				{
+					VMWriter.currentSegment = THATseg;
+					VMWriter.writePush(VMWriter.currentSegment, 0); // push that
+				}
+				else
+				{
+
+				}
 				++tokenCount;
 			}
 			else if (J->tokenList[tokenCount] == SYMBOL)			// Unary op case/expression
@@ -1258,6 +1386,7 @@ public:
 				writeIdentifier(J->tokenString[tokenCount]);			// <identifier> varName 
 				// Symbol table state definition
 				symbolTable.checkDefined(J->tokenString[tokenCount]);
+				symbolTable.currentSubName = J->tokenString[tokenCount];
 				if (symbolTable.beingDefined)
 				{
 					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(CLASS) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
@@ -1273,6 +1402,7 @@ public:
 					writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName/className/varName
 					// Symbol table state definition
 					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(CLASS) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
+					VMWriter.writeCall(symbolTable.currentSubName,1); //need to fix for nArgs
 					// End symbol table state definition
 					++tokenCount;
 					if (J->tokenString[tokenCount] == "(")
@@ -1288,8 +1418,11 @@ public:
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> .
 						++tokenCount;
 						writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
-						// Symbol table state definition
+				
+																			// Symbol table state definition
 						outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
+						symbolTable.currentSubName = symbolTable.currentSubName + "." + J->tokenString[tokenCount];
+						VMWriter.writeCall(symbolTable.currentSubName,1); // need fix for nArgs
 						// End symbol table state definition
 						++tokenCount;
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
@@ -1307,6 +1440,8 @@ public:
 					writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
 					// Symbol table state definition
 					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
+					symbolTable.currentSubName = symbolTable.currentSubName + "." + J->tokenString[tokenCount];
+					VMWriter.writeCall(symbolTable.currentSubName, 0); // need fix for nArgs
 					// End symbol table state definition
 					++tokenCount;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
@@ -1323,7 +1458,12 @@ public:
 					writeSymbol(J->tokenString[tokenCount]);		// <symbol> ]
 					++tokenCount;
 				}
-				else {}
+				else 
+				{
+					//symbolTable.currentKind = symbolTable.KindOf(J->tokenString[tokenCount - 1]));
+					VMWriter.findSegment(symbolTable.KindOf(symbolTable.currentSubName));
+					VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(symbolTable.currentSubName)); // needs to push
+				}
 			}
 			outputFileStream << "</term>" << endl;
 	}
