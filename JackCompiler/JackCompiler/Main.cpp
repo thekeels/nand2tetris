@@ -805,11 +805,13 @@ class CompilationEngine : public JackTokenizer
 	string currentFileName;
 	string functionType;
 	int fieldCounter=0;
+	vector<string> expressionOPVector;
 public:
 	int tokenCount = 0;
 	int localCount = 0;
+	int termCounter = 0;
 	JackTokenizer* J;
-	int varCount = 0;
+	int argCount = 0;
 
 	CompilationEngine(string directory, string filename, JackTokenizer &Jack)
 	{
@@ -941,7 +943,7 @@ public:
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 		++tokenCount;
-		varCount = 0;
+		argCount = 0;		// determines number of arguments in the subroutine
 		CompileParameterList();								// prints the Parameter List
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 		++tokenCount;
@@ -954,11 +956,11 @@ public:
 		}
 		if (functionType == "function")
 		{
-			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, localCount);// need fix to set localCount?
+			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, argCount);// need fix to set localCount?
 		}
 		else if (functionType == "constructor")
 		{
-			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, localCount);
+			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, localCount); // need to check localCount
 			VMWriter.writePush(CONSTseg, fieldCounter);
 			VMWriter.writeCall("Memory.alloc", 1);
 			VMWriter.writePop(POINTERseg, 0);
@@ -970,7 +972,7 @@ public:
 		}
 		else if (functionType == "method")
 		{
-			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, localCount);
+			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, argCount);
 			VMWriter.writePush(ARGseg, 0);
 			VMWriter.writePop(POINTERseg, 0);
 		}
@@ -1001,7 +1003,7 @@ public:
 				outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
 				// End symbol table state definition
 			}
-			++varCount;
+			++argCount;
 			++tokenCount;
 			writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
 			// Symbol table state definition
@@ -1020,7 +1022,7 @@ public:
 			{
 				writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
 				++tokenCount;
-				++varCount;
+				++argCount;
 				if (J->tokenList[tokenCount] == KEYWORD)
 				{
 					writeKeyword(J->tokenString[tokenCount]);		// prints <keyword> int/char/boolean
@@ -1156,7 +1158,7 @@ public:
 				symbolTable.currentSubName = symbolTable.currentClassName + "." + symbolTable.currentSubName;
 			}
 			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(symbolTable.currentKind) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
-			VMWriter.writePush(POINTERseg, 0); // needs to push THIS
+			//VMWriter.writePush(POINTERseg, 0); // needs to push THIS
 		}
 		else
 		{
@@ -1184,13 +1186,13 @@ public:
 			// Symbol table state definition
 			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
 			symbolTable.currentSubName = symbolTable.currentSubName + "." + J->tokenString[tokenCount];
-			VMWriter.writeCall(symbolTable.currentSubName, 1); // need fix for nArgs
 			// End symbol table state definition
 			++tokenCount;
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 			++tokenCount;
 			CompileExpressionList();							// calls expression list
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
+			VMWriter.writeCall(symbolTable.currentSubName, argCount); // need check for nArgs
 			++tokenCount;
 		}
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;		
@@ -1220,7 +1222,7 @@ public:
 
 		}
 		outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
-		varCount = symbolTable.IndexOf(J->tokenString[tokenCount]);
+		argCount = symbolTable.IndexOf(J->tokenString[tokenCount]);
 		VMWriter.findSegment(symbolTable.currentKind);
 		// End symbol table state definition
 		++tokenCount;
@@ -1229,6 +1231,7 @@ public:
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> [
 			++tokenCount;
 			CompileExpression();								// print the expression
+			//ExecuteExpression();
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
 			++tokenCount;
 		}
@@ -1238,9 +1241,10 @@ public:
 		writeSymbol(J->tokenString[tokenCount]);				// if no array, print <symbol> =
 		++tokenCount;
 		CompileExpression();
+		ExecuteExpression();
 		symbolTable.checkDefined(symbolTable.currentLet);// print the expression
 		VMWriter.findSegment(symbolTable.KindOf(symbolTable.currentLet));
-		VMWriter.writePop(VMWriter.currentSegment, varCount);
+		VMWriter.writePop(VMWriter.currentSegment, argCount);
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
 		++tokenCount;
 		outputFileStream << "</letStatement>" << endl;			// </letStatement>
@@ -1253,6 +1257,7 @@ public:
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> (
 		++tokenCount;
 		CompileExpression();									// print the expression
+		//ExecuteExpression();
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> )
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> {
@@ -1274,6 +1279,7 @@ public:
 		else 
 		{
 			CompileExpression();								// otherwise, print the expression
+			//ExecuteExpression();
 			VMWriter.writePush(VMWriter.currentSegment, 0); //need to verify index
 		}
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
@@ -1289,6 +1295,7 @@ public:
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> (
 		++tokenCount;
 		CompileExpression();									// print the expression
+		//ExecuteExpression();
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> )
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> {
@@ -1314,12 +1321,22 @@ public:
 		outputFileStream << "<expression>" << endl;				// <expression>
 		while ((J->tokenString[tokenCount] != ")") && (J->tokenString[tokenCount] != ";") && (J->tokenString[tokenCount] != "]"))
 		{
-			CompileTerm();											// Print the term
+			CompileTerm();	// Print the term
 			while ((J->tokenString[tokenCount] == "-") || (J->tokenString[tokenCount] == "+") || (J->tokenString[tokenCount] == "*") || (J->tokenString[tokenCount] == "/") || (J->tokenString[tokenCount] == "&") || (J->tokenString[tokenCount] == "|") || (J->tokenString[tokenCount] == "<") || (J->tokenString[tokenCount] == ">") || (J->tokenString[tokenCount] == "="))
 			{
+				string opType = J->tokenString[tokenCount];
 				writeSymbol(J->tokenString[tokenCount]);			// <symbol> op symbol
 				++tokenCount;
+				expressionOPVector.push_back(opType);
 				CompileTerm();
+				//if (opType == "*")
+				//{
+					
+				//}
+				//else if (opType == "+")
+				//{
+				//	expressionOPVector.push_back(opType);
+				//}
 			}
 			outputFileStream << "</expression>" << endl;
 			if (J->tokenString[tokenCount] == ",")
@@ -1328,11 +1345,58 @@ public:
 			}
 		}
 	}
+	void ExecuteExpression()
+	{
+		for (int x = expressionOPVector.size()-1; x >= 0; x--)
+		{
+			string currentOp = expressionOPVector[x];
+			if (currentOp == "+")
+			{
+				VMWriter.writeArithmetic(ADD);
+			}
+			else if (currentOp == "-")
+			{
+				VMWriter.writeArithmetic(SUB);
+			}
+			else if (currentOp == "*")
+			{
+				VMWriter.writeCall("Math.multiply",2);
+			}
+			else if (currentOp == "/")
+			{
+				VMWriter.writeCall("Math.divide", 2);
+			}
+			else if (currentOp == "&")
+			{
+				VMWriter.writeArithmetic(AND);
+			}
+			else if (currentOp == "|")
+			{
+				VMWriter.writeArithmetic(OR);
+			}
+			else if (currentOp == "<")
+			{
+				VMWriter.writeArithmetic(LT);
+			}
+			else if (currentOp == ">")
+			{
+				VMWriter.writeArithmetic(GT);
+			}
+			else if (currentOp == "=")
+			{
+				VMWriter.writeArithmetic(EQ);
+			}
+		}
+		expressionOPVector.clear();
+	}
 	void CompileTerm()
 	{
 		outputFileStream << "<term>" << endl;
 			if (J->tokenList[tokenCount] == INT_CONST)				// integer constant case
 			{
+				VMWriter.currentSegment = CONSTseg;
+				int temp = stoi(J->tokenString[tokenCount]);
+				VMWriter.writePush(VMWriter.currentSegment, temp); // push constant value
 				writeIntConst(J->tokenString[tokenCount]);			// <integerConst> 
 				++tokenCount;
 			}
@@ -1353,6 +1417,25 @@ public:
 				{
 					VMWriter.currentSegment = THATseg;
 					VMWriter.writePush(VMWriter.currentSegment, 0); // push that
+				}
+				else if (J->tokenString[tokenCount] == "true")
+				{
+					VMWriter.currentSegment = ARGseg;
+					VMWriter.writePush(VMWriter.currentSegment, 0); // push true // need to push argument, pop pointer, push constant 0, and perform not (this results in arg being set to true)
+					VMWriter.currentSegment = POINTERseg;			// need to check all the 0 values here
+					VMWriter.writePush(VMWriter.currentSegment, 0);
+					VMWriter.currentSegment = CONSTseg;
+					VMWriter.writePush(VMWriter.currentSegment, 0);
+					VMWriter.writeArithmetic(NOT);
+				}
+				else if (J->tokenString[tokenCount] == "false")
+				{
+					VMWriter.currentSegment = ARGseg;
+					VMWriter.writePush(VMWriter.currentSegment, 0); // push false // need to push argument, pop pointer, push constant 0 (this results in arg being set to false)
+					VMWriter.currentSegment = POINTERseg;
+					VMWriter.writePush(VMWriter.currentSegment, 0);
+					VMWriter.currentSegment = CONSTseg;
+					VMWriter.writePush(VMWriter.currentSegment, 0);
 				}
 				else
 				{
@@ -1477,12 +1560,17 @@ public:
 		else
 		{
 			CompileExpression();
+			ExecuteExpression();
 			while (J->tokenString[tokenCount] == ",")
 			{
+				termCounter = 0; // Keep track of number of terms in the expression (maybe not needed)...
 				writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
 				++tokenCount;
 				CompileExpression();
+				ExecuteExpression();
+				++argCount; // Keeps track of number of arguments in a function -- if separated by commas, we can increment by 1
 			}
+			++argCount; // By default, if the expression list has at least 1 argument, we increment by 1.
 		}
 		outputFileStream << "</expressionList>" << endl;
 	}
