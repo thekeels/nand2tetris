@@ -812,6 +812,8 @@ public:
 	int termCounter = 0;
 	JackTokenizer* J;
 	int argCount = 0;
+	vector<int> labelCountVector;
+	int labelCount=-1;
 
 	CompilationEngine(string directory, string filename, JackTokenizer &Jack)
 	{
@@ -1251,13 +1253,19 @@ public:
 	}
 	void CompileWhile()
 	{
+		++labelCount;
+		//labelCountVector.push_back(labelCount);
+		VMWriter.writeLabel("WHILE_EXP" + to_string(labelCount));	// WHILE label
+
 		outputFileStream << "<whileStatement>" << endl;			// <whileStatement>
 		writeKeyword(J->tokenString[tokenCount]);				// <keyword> while
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> (
 		++tokenCount;
 		CompileExpression();									// print the expression
-		//ExecuteExpression();
+		ExecuteExpression();
+		VMWriter.writeArithmetic(NOT);	// Code for NOT (exp)
+		VMWriter.writeIf("WHILE_END" + to_string(labelCount));
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> )
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> {
@@ -1266,6 +1274,10 @@ public:
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> }
 		++tokenCount;
 		outputFileStream << "</whileStatement>" << endl;		// </whileStatements>
+
+		VMWriter.writeGoto("WHILE_EXP" + to_string(labelCount));		// WHILE Restart condition
+		VMWriter.writeLabel("WHILE_END" + to_string(labelCount));		// WHILE End condition
+		--labelCount;  // decrement label counter
 	}
 	void CompileReturn()
 	{
@@ -1289,18 +1301,28 @@ public:
 	}
 	void CompileIf()
 	{
+		++labelCount;
 		outputFileStream << "<ifStatement>" << endl;			// <ifStatement>
 		writeKeyword(J->tokenString[tokenCount]);				// <keyword> if
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> (
 		++tokenCount;
+
+		//labelCountVector.push_back(labelCount);
+
 		CompileExpression();									// print the expression
-		//ExecuteExpression();
+		ExecuteExpression();
+		VMWriter.writeArithmetic(NOT); // VM code for computing ~(cond)
+
+		VMWriter.writeIf("IF_TRUE" + labelCount);	// VM code for: if-goto L1
+
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> )
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> {
 		++tokenCount;
 		CompileStatements();									// print the statements
+		VMWriter.writeGoto("IF_FALSE" + to_string(labelCount));	// goto L2
+		VMWriter.writeLabel("IF_TRUE" + to_string(labelCount));  // L1
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> }
 		++tokenCount;
 		if (J->tokenString[tokenCount] == "else")				// if there is an else block, print it
@@ -1314,6 +1336,8 @@ public:
 			++tokenCount;
 		}
 		else;
+		VMWriter.writeLabel("IF_FALSE" + to_string(labelCount)); // L2
+		--labelCount;
 		outputFileStream << "</ifStatement>" << endl;			// </ifStatement>
 	}
 	void CompileExpression()
