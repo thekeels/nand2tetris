@@ -9,7 +9,7 @@
 
 #include <io.h>
 using namespace std;
-enum varType { STATIC, FIELD, ARG, VAR, NONE,CLASS, SUBROUTINE};
+enum varType { STATIC, FIELD, ARG, VAR, NONE,CLASS, SUBROUTINE, OBJECT};
 enum tokenType { KEYWORD, SYMBOL, IDENTIFIER, INT_CONST, STRING_CONST, TOKEN_NULL, TOKEN_ERROR};
 // 0 = KEYWORD, 1= SYMBOL, 2 = IDENTIFIER, 3 = INT_CONST, 4 = STRING_CONST
 enum segmentType {CONSTseg, ARGseg, LOCALseg, STATICseg, THISseg, THATseg, POINTERseg, TEMPseg};
@@ -1166,6 +1166,7 @@ public:
 			{
 				symbolTable.currentKind = SUBROUTINE;
 				symbolTable.currentSubName = symbolTable.currentClassName + "." + symbolTable.currentSubName;
+				symbolTable.currentCategory = OBJECT;
 			}
 			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(symbolTable.currentKind) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
 			//VMWriter.writePush(POINTERseg, 0); // needs to push THIS
@@ -1176,6 +1177,10 @@ public:
 			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
 			symbolTable.currentSubName = symbolTable.TypeOf(J->tokenString[tokenCount]);
 			VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(J->tokenString[tokenCount])); // needs to push
+			if (symbolTable.currentKind == VAR)
+			{
+				++argCount; // If VAR, then we are dealing with an object and need to increment arg to account for "THIS"
+			}
 		}
 		// End symbol table state definition
 		++tokenCount;
@@ -1184,6 +1189,10 @@ public:
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 			++tokenCount;
 			CompileExpressionList();							// calls expression list
+			if (symbolTable.currentCategory == OBJECT)
+			{
+				VMWriter.writePush(POINTERseg, 0);
+			}
 			VMWriter.writeCall(symbolTable.currentSubName, 1); // need fix for nArgs
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 			++tokenCount;
@@ -1443,7 +1452,7 @@ public:
 				if (J->tokenString[tokenCount] == "this")
 				{
 					VMWriter.currentSegment = POINTERseg;
-					//VMWriter.writePush(VMWriter.currentSegment, 0); // push this
+					VMWriter.writePush(VMWriter.currentSegment, 0); // push this
 				}
 				else if (J->tokenString[tokenCount] == "that")
 				{
