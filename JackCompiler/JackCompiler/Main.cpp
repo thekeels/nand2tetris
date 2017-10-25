@@ -1247,10 +1247,14 @@ public:
 		++tokenCount;
 		if (J->tokenString[tokenCount] == "[")					// if array, print the array notation
 		{
+			string arrayName = J->tokenString[tokenCount - 1];
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> [
 			++tokenCount;
 			CompileExpression();								// print the expression
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
+			VMWriter.findSegment(symbolTable.KindOf(arrayName));
+			VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(arrayName)); // need to push base adress of array
+			VMWriter.writeArithmetic(ADD);
 			++tokenCount;
 		}
 		else;
@@ -1443,6 +1447,15 @@ public:
 			}
 			else if (J->tokenList[tokenCount] == STRING_CONST)		// string constant case
 			{
+				VMWriter.writePush(CONSTseg, J->tokenString[tokenCount].length()-2);
+				VMWriter.writeCall("String.new", 1);
+				for (unsigned i = 1; i < J->tokenString[tokenCount].length()-1; i++)
+				{
+					char& character = J->tokenString[tokenCount].at(i);
+					int ascii = (int)character;
+					VMWriter.writePush(CONSTseg, ascii);
+					VMWriter.writeCall("String.appendChar", 2);
+				}
 				writeStringConst(J->tokenString[tokenCount]);			// <stringConst> 
 				++tokenCount;
 			}
@@ -1586,10 +1599,20 @@ public:
 				}
 				else if (J->tokenString[tokenCount] == "[")				// array
 				{
-					writeSymbol(J->tokenString[tokenCount]);		// <symbol> [
+					//writeSymbol(J->tokenString[tokenCount]);		// <symbol> [
+					//++tokenCount;
+					//CompileExpression();							// print expression
+					//writeSymbol(J->tokenString[tokenCount]);		// <symbol> ]
+					//++tokenCount;
+
+					string arrayName = J->tokenString[tokenCount - 1];
+					writeSymbol(J->tokenString[tokenCount]);			// <symbol> [
 					++tokenCount;
-					CompileExpression();							// print expression
-					writeSymbol(J->tokenString[tokenCount]);		// <symbol> ]
+					CompileExpression();								// print the expression
+					writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
+					VMWriter.findSegment(symbolTable.KindOf(arrayName));
+					VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(arrayName)); // need to push base adress of array
+					VMWriter.writeArithmetic(ADD);
 					++tokenCount;
 				}
 				else 
