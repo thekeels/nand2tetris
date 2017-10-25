@@ -431,15 +431,17 @@ class SymbolTable
 	vector<string> typeColMethod;	// Creates a column with the type of the variable -- Method-scope Table
 	vector<varType> kindColMethod;	// Creates a column with the memory type of the variable -- Method-scope Table
 	vector<int> indexColMethod;		// Creates a column with the index of the variable -- Method-scope Table
-	int staticCounterM = 0, argCounterM = 0, varCounterM = 0, fieldCounterM = 0; // Counters for method identifiers
-	int staticCounterC = 0, argCounterC = 0, varCounterC = 0, fieldCounterC = 0; // Counters for method identifiers
+
 
 
 public:
+	int staticCounterM = 0, argCounterM = 0, varCounterM = 0, fieldCounterM = 0; // Counters for method identifiers
+	int staticCounterC = 0, argCounterC = 0, varCounterC = 0, fieldCounterC = 0; // Counters for method identifiers
 	string printbeingDefined;
 	string printCategory;
 	string currentClassName;
 	string currentSubName;
+	string currentVarName;
 	string currentFunction;
 	string currentLet;
 	bool inSubroutine = false; // false = class-scope, true = method-scope 
@@ -813,7 +815,11 @@ public:
 	JackTokenizer* J;
 	int argCount = 0;
 	vector<int> labelCountVector;
-	int labelCount=-1;
+	int ifCount=0;
+	int whileCount = 0;
+	//bool negFlag = false;
+	//bool notFlag = false;
+	string opType;
 
 	CompilationEngine(string directory, string filename, JackTokenizer &Jack)
 	{
@@ -921,6 +927,8 @@ public:
 	void CompileSubroutine()
 	{
 		symbolTable.startSubroutine();
+		ifCount = 0;
+		whileCount = 0;
 		outputFileStream << "<subroutineDec>" << endl;		// <subroutineDec>
 		writeKeyword(J->tokenString[tokenCount]);			// <keyword> constructor/method/function
 		functionType = J->tokenString[tokenCount];
@@ -945,20 +953,20 @@ public:
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 		++tokenCount;
-		argCount = 0;		// determines number of arguments in the subroutine
 		CompileParameterList();								// prints the Parameter List
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 		++tokenCount;
 		outputFileStream << "<subroutineBody>" << endl;		// <subroutineBody>
 		writeSymbol(J->tokenString[tokenCount]);			// <symbol> {		
 		++tokenCount;
+		localCount = 0;
 		while (J->tokenString[tokenCount] == "var")
 		{
 			CompileVarDec();								// prints all the VarDecs
 		}
 		if (functionType == "function")
 		{
-			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, argCount);// need fix to set localCount?
+			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, localCount);// need fix to set localCount?
 		}
 		else if (functionType == "constructor")
 		{
@@ -974,7 +982,7 @@ public:
 		}
 		else if (functionType == "method")
 		{
-			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, argCount);
+			VMWriter.writeFunction(symbolTable.currentClassName + "." + symbolTable.currentSubName, localCount); // need to check
 			VMWriter.writePush(ARGseg, 0);
 			VMWriter.writePop(POINTERseg, 0);
 		}
@@ -1005,7 +1013,6 @@ public:
 				outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
 				// End symbol table state definition
 			}
-			++argCount;
 			++tokenCount;
 			writeIdentifier(J->tokenString[tokenCount]);		// prints <identifier> varName
 			// Symbol table state definition
@@ -1024,7 +1031,6 @@ public:
 			{
 				writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
 				++tokenCount;
-				++argCount;
 				if (J->tokenList[tokenCount] == KEYWORD)
 				{
 					writeKeyword(J->tokenString[tokenCount]);		// prints <keyword> int/char/boolean
@@ -1056,6 +1062,7 @@ public:
 	}
 	void CompileVarDec()
 	{
+
 		outputFileStream << "<varDec>" << endl;
 		writeKeyword(J->tokenString[tokenCount]);				// <keyword> var
 		++tokenCount;
@@ -1140,6 +1147,7 @@ public:
 	}
 	void CompileDo()
 	{
+		argCount = 0;
 		outputFileStream << "<doStatement>" << endl;		// <doStatement>
 		writeKeyword(J->tokenString[tokenCount]);			// <keyword> do
 		++tokenCount;
@@ -1204,6 +1212,7 @@ public:
 	}
 	void CompileLet()
 	{
+		argCount = 0;
 		outputFileStream << "<letStatement>" << endl;			// <letStatement>
 		writeKeyword(J->tokenString[tokenCount]);				// <keyword> let
 		++tokenCount;
@@ -1224,7 +1233,6 @@ public:
 
 		}
 		outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
-		argCount = symbolTable.IndexOf(J->tokenString[tokenCount]);
 		VMWriter.findSegment(symbolTable.currentKind);
 		// End symbol table state definition
 		++tokenCount;
@@ -1233,29 +1241,28 @@ public:
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> [
 			++tokenCount;
 			CompileExpression();								// print the expression
-			//ExecuteExpression();
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
 			++tokenCount;
 		}
 		else;
 		
-		
+
 		writeSymbol(J->tokenString[tokenCount]);				// if no array, print <symbol> =
 		++tokenCount;
 		CompileExpression();
-		ExecuteExpression();
 		symbolTable.checkDefined(symbolTable.currentLet);// print the expression
 		VMWriter.findSegment(symbolTable.KindOf(symbolTable.currentLet));
-		VMWriter.writePop(VMWriter.currentSegment, argCount);
+		VMWriter.writePop(VMWriter.currentSegment, symbolTable.IndexOf(symbolTable.currentLet));
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
 		++tokenCount;
 		outputFileStream << "</letStatement>" << endl;			// </letStatement>
 	}
 	void CompileWhile()
 	{
-		++labelCount;
-		//labelCountVector.push_back(labelCount);
-		VMWriter.writeLabel("WHILE_EXP" + to_string(labelCount));	// WHILE label
+		
+		labelCountVector.push_back(whileCount);
+		++whileCount;
+		VMWriter.writeLabel("WHILE_EXP" + to_string(labelCountVector.back()));	// WHILE label
 
 		outputFileStream << "<whileStatement>" << endl;			// <whileStatement>
 		writeKeyword(J->tokenString[tokenCount]);				// <keyword> while
@@ -1263,9 +1270,8 @@ public:
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> (
 		++tokenCount;
 		CompileExpression();									// print the expression
-		ExecuteExpression();
 		VMWriter.writeArithmetic(NOT);	// Code for NOT (exp)
-		VMWriter.writeIf("WHILE_END" + to_string(labelCount));
+		VMWriter.writeIf("WHILE_END" + to_string(labelCountVector.back()));
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> )
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> {
@@ -1275,9 +1281,10 @@ public:
 		++tokenCount;
 		outputFileStream << "</whileStatement>" << endl;		// </whileStatements>
 
-		VMWriter.writeGoto("WHILE_EXP" + to_string(labelCount));		// WHILE Restart condition
-		VMWriter.writeLabel("WHILE_END" + to_string(labelCount));		// WHILE End condition
-		--labelCount;  // decrement label counter
+		VMWriter.writeGoto("WHILE_EXP" + to_string(labelCountVector.back()));		// WHILE Restart condition
+		VMWriter.writeLabel("WHILE_END" + to_string(labelCountVector.back()));		// WHILE End condition
+		labelCountVector.pop_back();
+		;
 	}
 	void CompileReturn()
 	{
@@ -1291,8 +1298,6 @@ public:
 		else 
 		{
 			CompileExpression();								// otherwise, print the expression
-			//ExecuteExpression();
-			VMWriter.writePush(VMWriter.currentSegment, 0); //need to verify index
 		}
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
 		++tokenCount;
@@ -1301,32 +1306,33 @@ public:
 	}
 	void CompileIf()
 	{
-		++labelCount;
+		
+		labelCountVector.push_back(ifCount);
+		++ifCount;
 		outputFileStream << "<ifStatement>" << endl;			// <ifStatement>
 		writeKeyword(J->tokenString[tokenCount]);				// <keyword> if
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> (
 		++tokenCount;
 
-		//labelCountVector.push_back(labelCount);
-
 		CompileExpression();									// print the expression
-		ExecuteExpression();
-		VMWriter.writeArithmetic(NOT); // VM code for computing ~(cond)
 
-		VMWriter.writeIf("IF_TRUE" + labelCount);	// VM code for: if-goto L1
-
+		VMWriter.writeIf("IF_TRUE" + to_string(labelCountVector.back()));	// VM code for: if-goto L1
+		VMWriter.writeGoto("IF_FALSE" + to_string(labelCountVector.back()));	// goto L2
+		VMWriter.writeLabel("IF_TRUE" + to_string(labelCountVector.back()));  // L1// print the statements
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> )
 		++tokenCount;
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> {
 		++tokenCount;
-		CompileStatements();									// print the statements
-		VMWriter.writeGoto("IF_FALSE" + to_string(labelCount));	// goto L2
-		VMWriter.writeLabel("IF_TRUE" + to_string(labelCount));  // L1
+		CompileStatements();			
+
+
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> }
 		++tokenCount;
 		if (J->tokenString[tokenCount] == "else")				// if there is an else block, print it
 		{
+			VMWriter.writeGoto("IF_END" + to_string(labelCountVector.back())); // L2
+			VMWriter.writeLabel("IF_FALSE" + to_string(labelCountVector.back()));  // L1// print the statements
 			writeKeyword(J->tokenString[tokenCount]);			// <keyword> else
 			++tokenCount;
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> {
@@ -1336,8 +1342,8 @@ public:
 			++tokenCount;
 		}
 		else;
-		VMWriter.writeLabel("IF_FALSE" + to_string(labelCount)); // L2
-		--labelCount;
+		VMWriter.writeLabel("IF_END" + to_string(labelCountVector.back()));  // L1// print the statements
+		labelCountVector.pop_back();
 		outputFileStream << "</ifStatement>" << endl;			// </ifStatement>
 	}
 	void CompileExpression()
@@ -1348,19 +1354,11 @@ public:
 			CompileTerm();	// Print the term
 			while ((J->tokenString[tokenCount] == "-") || (J->tokenString[tokenCount] == "+") || (J->tokenString[tokenCount] == "*") || (J->tokenString[tokenCount] == "/") || (J->tokenString[tokenCount] == "&") || (J->tokenString[tokenCount] == "|") || (J->tokenString[tokenCount] == "<") || (J->tokenString[tokenCount] == ">") || (J->tokenString[tokenCount] == "="))
 			{
-				string opType = J->tokenString[tokenCount];
+				opType = J->tokenString[tokenCount];
 				writeSymbol(J->tokenString[tokenCount]);			// <symbol> op symbol
 				++tokenCount;
 				expressionOPVector.push_back(opType);
 				CompileTerm();
-				//if (opType == "*")
-				//{
-					
-				//}
-				//else if (opType == "+")
-				//{
-				//	expressionOPVector.push_back(opType);
-				//}
 			}
 			outputFileStream << "</expression>" << endl;
 			if (J->tokenString[tokenCount] == ",")
@@ -1368,12 +1366,13 @@ public:
 				break;
 			}
 		}
+		ExecuteExpression();
 	}
 	void ExecuteExpression()
 	{
-		for (int x = expressionOPVector.size()-1; x >= 0; x--)
+		if (expressionOPVector.size() != 0)
 		{
-			string currentOp = expressionOPVector[x];
+			string currentOp = expressionOPVector.back();
 			if (currentOp == "+")
 			{
 				VMWriter.writeArithmetic(ADD);
@@ -1384,7 +1383,7 @@ public:
 			}
 			else if (currentOp == "*")
 			{
-				VMWriter.writeCall("Math.multiply",2);
+				VMWriter.writeCall("Math.multiply", 2);
 			}
 			else if (currentOp == "/")
 			{
@@ -1410,8 +1409,17 @@ public:
 			{
 				VMWriter.writeArithmetic(EQ);
 			}
+			else if (currentOp == "neg")
+			{
+				VMWriter.writeArithmetic(NEG);
+			}
+			else if (currentOp == "~")
+			{
+				VMWriter.writeArithmetic(NOT);
+			}
+			expressionOPVector.pop_back();
 		}
-		expressionOPVector.clear();
+			
 	}
 	void CompileTerm()
 	{
@@ -1444,20 +1452,12 @@ public:
 				}
 				else if (J->tokenString[tokenCount] == "true")
 				{
-					VMWriter.currentSegment = ARGseg;
-					VMWriter.writePush(VMWriter.currentSegment, 0); // push true // need to push argument, pop pointer, push constant 0, and perform not (this results in arg being set to true)
-					VMWriter.currentSegment = POINTERseg;			// need to check all the 0 values here
-					VMWriter.writePush(VMWriter.currentSegment, 0);
 					VMWriter.currentSegment = CONSTseg;
 					VMWriter.writePush(VMWriter.currentSegment, 0);
 					VMWriter.writeArithmetic(NOT);
 				}
 				else if (J->tokenString[tokenCount] == "false")
 				{
-					VMWriter.currentSegment = ARGseg;
-					VMWriter.writePush(VMWriter.currentSegment, 0); // push false // need to push argument, pop pointer, push constant 0 (this results in arg being set to false)
-					VMWriter.currentSegment = POINTERseg;
-					VMWriter.writePush(VMWriter.currentSegment, 0);
 					VMWriter.currentSegment = CONSTseg;
 					VMWriter.writePush(VMWriter.currentSegment, 0);
 				}
@@ -1471,6 +1471,8 @@ public:
 			{
 				if (J->tokenString[tokenCount] == "(")				// expression
 				{
+					//negFlag = false;
+					//notFlag = false;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 					++tokenCount;
 					CompileExpression();								// print expression
@@ -1479,6 +1481,19 @@ public:
 				}
 				else if ((J->tokenString[tokenCount] == "-")|| (J->tokenString[tokenCount] == "~"))				// "-" or "~" unary op
 				{
+					if (J->tokenString[tokenCount] == "-")
+						
+					{
+						//negFlag = true;
+						opType = "neg";
+						expressionOPVector.push_back(opType);
+					}
+					else if (J->tokenString[tokenCount] == "~")
+					{
+						//notFlag = true;
+						opType = "~";
+						expressionOPVector.push_back(opType);
+					}
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> "unary op"
 					++tokenCount;
 					CompileTerm();										// unary op term
@@ -1493,7 +1508,7 @@ public:
 				writeIdentifier(J->tokenString[tokenCount]);			// <identifier> varName 
 				// Symbol table state definition
 				symbolTable.checkDefined(J->tokenString[tokenCount]);
-				symbolTable.currentSubName = J->tokenString[tokenCount];
+				symbolTable.currentVarName = J->tokenString[tokenCount];
 				if (symbolTable.beingDefined)
 				{
 					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(CLASS) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
@@ -1509,7 +1524,7 @@ public:
 					writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName/className/varName
 					// Symbol table state definition
 					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(CLASS) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
-					VMWriter.writeCall(symbolTable.currentSubName,1); //need to fix for nArgs
+					
 					// End symbol table state definition
 					++tokenCount;
 					if (J->tokenString[tokenCount] == "(")
@@ -1517,6 +1532,7 @@ public:
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 						++tokenCount;
 						CompileExpressionList();							// calls expression list
+						VMWriter.writeCall(symbolTable.currentSubName, argCount); //need to fix for nArgs
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 						++tokenCount;
 					}
@@ -1529,12 +1545,13 @@ public:
 																			// Symbol table state definition
 						outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
 						symbolTable.currentSubName = symbolTable.currentSubName + "." + J->tokenString[tokenCount];
-						VMWriter.writeCall(symbolTable.currentSubName,1); // need fix for nArgs
+
 						// End symbol table state definition
 						++tokenCount;
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 						++tokenCount;
 						CompileExpressionList();							// calls expression list
+						VMWriter.writeCall(symbolTable.currentSubName, argCount); // need fix for nArgs
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 						++tokenCount;
 					}
@@ -1547,13 +1564,14 @@ public:
 					writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
 					// Symbol table state definition
 					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
-					symbolTable.currentSubName = symbolTable.currentSubName + "." + J->tokenString[tokenCount];
-					VMWriter.writeCall(symbolTable.currentSubName, 0); // need fix for nArgs
+					symbolTable.currentSubName = symbolTable.currentVarName + "." + J->tokenString[tokenCount];
+
 					// End symbol table state definition
 					++tokenCount;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 					++tokenCount;
 					CompileExpressionList();							// calls expression list
+					VMWriter.writeCall(symbolTable.currentSubName, argCount); // need fix for nArgs
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 					++tokenCount;
 				}
@@ -1568,8 +1586,8 @@ public:
 				else 
 				{
 					//symbolTable.currentKind = symbolTable.KindOf(J->tokenString[tokenCount - 1]));
-					VMWriter.findSegment(symbolTable.KindOf(symbolTable.currentSubName));
-					VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(symbolTable.currentSubName)); // needs to push
+					VMWriter.findSegment(symbolTable.KindOf(symbolTable.currentVarName));
+					VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(symbolTable.currentVarName)); // needs to push
 				}
 			}
 			outputFileStream << "</term>" << endl;
@@ -1583,18 +1601,20 @@ public:
 		}
 		else
 		{
+			++argCount;
 			CompileExpression();
-			ExecuteExpression();
+			//ExecuteExpression();
 			while (J->tokenString[tokenCount] == ",")
 			{
 				termCounter = 0; // Keep track of number of terms in the expression (maybe not needed)...
 				writeSymbol(J->tokenString[tokenCount]);		// <symbol> ,
 				++tokenCount;
-				CompileExpression();
-				ExecuteExpression();
 				++argCount; // Keeps track of number of arguments in a function -- if separated by commas, we can increment by 1
+				CompileExpression();
+				//ExecuteExpression();
+
 			}
-			++argCount; // By default, if the expression list has at least 1 argument, we increment by 1.
+			// ++argCount; // By default, if the expression list has at least 1 argument, we increment by 1.
 		}
 		outputFileStream << "</expressionList>" << endl;
 	}
