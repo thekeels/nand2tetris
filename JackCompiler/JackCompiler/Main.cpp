@@ -817,8 +817,7 @@ public:
 	vector<int> labelCountVector;
 	int ifCount=0;
 	int whileCount = 0;
-	//bool negFlag = false;
-	//bool notFlag = false;
+	bool letArray = false;
 	string opType;
 
 	CompilationEngine(string directory, string filename, JackTokenizer &Jack)
@@ -1256,6 +1255,7 @@ public:
 			VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(arrayName)); // need to push base adress of array
 			VMWriter.writeArithmetic(ADD);
 			++tokenCount;
+			letArray = true;
 		}
 		else;
 		
@@ -1265,7 +1265,19 @@ public:
 		CompileExpression();
 		symbolTable.checkDefined(symbolTable.currentLet);// print the expression
 		VMWriter.findSegment(symbolTable.KindOf(symbolTable.currentLet));
-		VMWriter.writePop(VMWriter.currentSegment, symbolTable.IndexOf(symbolTable.currentLet));
+		if (letArray)
+		{
+			VMWriter.writePop(TEMPseg, 0); // place = expression in temp segment
+			VMWriter.writePop(POINTERseg, 1); // "THAT" access
+			VMWriter.writePush(TEMPseg, 0); // push = expression onto stack
+			VMWriter.writePop(THATseg, 0); // pop the = expression into THAT 0
+			letArray = false;	// reset letArray flag
+		}
+		else 
+		{
+			VMWriter.writePop(VMWriter.currentSegment, symbolTable.IndexOf(symbolTable.currentLet));
+		}
+		
 		writeSymbol(J->tokenString[tokenCount]);				// <symbol> ;
 		++tokenCount;
 		outputFileStream << "</letStatement>" << endl;			// </letStatement>
@@ -1430,6 +1442,12 @@ public:
 			{
 				VMWriter.writeArithmetic(NOT);
 			}
+			else if (currentOp == "[")
+			{
+				VMWriter.writePop(POINTERseg,1);
+				VMWriter.writePush(THATseg, 0);
+			}
+			else;
 			expressionOPVector.pop_back();
 		}
 			
@@ -1604,15 +1622,20 @@ public:
 					//CompileExpression();							// print expression
 					//writeSymbol(J->tokenString[tokenCount]);		// <symbol> ]
 					//++tokenCount;
-
+					
 					string arrayName = J->tokenString[tokenCount - 1];
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> [
 					++tokenCount;
+					opType = "";
+					expressionOPVector.push_back(opType); // blank operation necessary here to delay the evaluation of the expression
 					CompileExpression();								// print the expression
-					writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
 					VMWriter.findSegment(symbolTable.KindOf(arrayName));
 					VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(arrayName)); // need to push base adress of array
-					VMWriter.writeArithmetic(ADD);
+					VMWriter.writeArithmetic(ADD); // add base array to evaluated expression
+					opType = "[";
+					expressionOPVector.push_back(opType); // array operation necessary here
+					writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
+					ExecuteExpression(); // need to execute the array operation here?
 					++tokenCount;
 				}
 				else 
