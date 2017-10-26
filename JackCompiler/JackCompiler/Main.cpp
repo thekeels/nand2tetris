@@ -1552,6 +1552,11 @@ public:
 					VMWriter.currentSegment = CONSTseg;
 					VMWriter.writePush(VMWriter.currentSegment, 0);
 				}
+				else if (J->tokenString[tokenCount] == "null")
+				{
+					VMWriter.currentSegment = CONSTseg;
+					VMWriter.writePush(VMWriter.currentSegment, 0); // push null 0
+				}
 				else
 				{
 
@@ -1643,6 +1648,8 @@ public:
 						++tokenCount;
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 						++tokenCount;
+						//opType = "";
+						//expressionOPVector.push_back(opType); // blank operation necessary here to delay the evaluation of the expression until function expression is loaded
 						CompileExpressionList();							// calls expression list
 						VMWriter.writeCall(symbolTable.currentSubName, argCount); // need fix for nArgs
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
@@ -1674,6 +1681,8 @@ public:
 					++tokenCount;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 					++tokenCount;
+					opType = "";
+					expressionOPVector.push_back(opType); // blank operation necessary here to delay the evaluation of the expression until function expression is loaded
 					CompileExpressionList();							// calls expression list
 					VMWriter.writeCall(symbolTable.currentSubName, argCount); // need fix for nArgs
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
@@ -1690,7 +1699,7 @@ public:
 					string arrayName = J->tokenString[tokenCount - 1];
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> [
 					++tokenCount;
-					opType = "";
+					opType = ""
 					expressionOPVector.push_back(opType); // blank operation necessary here to delay the evaluation of the expression
 					CompileExpression();								// print the expression
 					VMWriter.findSegment(symbolTable.KindOf(arrayName));
