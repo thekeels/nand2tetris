@@ -426,15 +426,18 @@ class SymbolTable
 	vector<string> nameColClass;	// Creates a column with the variable names -- Class-scope Table
 	vector<string> typeColClass;	// Creates a column with the type of the variable -- Class-scope Table
 	vector<varType> kindColClass;	// Creates a column with the memory type of the variable -- Class-scope Table
+	vector<varType> categoryColClass;	// Creates a column with the memory type of the variable -- Class-scope Table
 	vector<int> indexColClass;		// Creates a column with the index of the variable -- Class-scope Table
-	vector<string> nameColMethod;	// Creates a column with the variable names -- Method-scope Table
-	vector<string> typeColMethod;	// Creates a column with the type of the variable -- Method-scope Table
-	vector<varType> kindColMethod;	// Creates a column with the memory type of the variable -- Method-scope Table
-	vector<int> indexColMethod;		// Creates a column with the index of the variable -- Method-scope Table
+
 
 
 
 public:
+	vector<string> nameColMethod;	// Creates a column with the variable names -- Method-scope Table
+	vector<string> typeColMethod;	// Creates a column with the type of the variable -- Method-scope Table
+	vector<varType> kindColMethod;	// Creates a column with the memory type of the variable -- Method-scope Table
+	vector<varType> categoryColMethod;	// Creates a column with the memory type of the variable -- Method-scope Table
+	vector<int> indexColMethod;		// Creates a column with the index of the variable -- Method-scope Table
 	int staticCounterM = 0, argCounterM = 0, varCounterM = 0, fieldCounterM = 0; // Counters for method identifiers
 	int staticCounterC = 0, argCounterC = 0, varCounterC = 0, fieldCounterC = 0; // Counters for method identifiers
 	string printbeingDefined;
@@ -457,6 +460,7 @@ public:
 		typeColMethod.clear();
 		kindColMethod.clear();
 		indexColMethod.clear();
+		categoryColMethod.clear();
 		inSubroutine = true;
 		staticCounterM = 0, argCounterM = 0, varCounterM = 0, fieldCounterM = 0; // Counters for method identifiers
 		return;
@@ -515,7 +519,29 @@ public:
 		}
 		return printClassOrSub;
 	}
-
+	bool isObject(string name)
+	{
+		int pos = findIndex(name);
+		varType posCategory;
+		bool object;
+		if (inSubroutine && !global)
+		{
+			posCategory = categoryColMethod[pos];
+		}
+		else
+		{
+			posCategory = categoryColClass[pos];
+		}
+		if (posCategory == OBJECT)
+		{
+			object = true;
+		}
+		else
+		{
+			object = false;
+		}
+		return object;
+	}
 
 	string PrintCategory(string name)
 	{
@@ -579,7 +605,7 @@ public:
 				indexColMethod.push_back(IndexOf(name));
 				nameColMethod.push_back(name);
 				typeColMethod.push_back(type);
-
+				categoryColMethod.push_back(NONE);
 				++varCounterM;
 			}
 			else
@@ -588,7 +614,7 @@ public:
 				indexColClass.push_back(IndexOf(name));
 				nameColClass.push_back(name);
 				typeColClass.push_back(type);
-
+				categoryColClass.push_back(NONE);
 				++varCounterC;
 			}
 		}
@@ -600,7 +626,7 @@ public:
 				indexColMethod.push_back(IndexOf(name));
 				nameColMethod.push_back(name);
 				typeColMethod.push_back(type);
-
+				categoryColMethod.push_back(NONE);
 				++staticCounterM;
 			}
 			else
@@ -609,7 +635,7 @@ public:
 				indexColClass.push_back(IndexOf(name));
 				nameColClass.push_back(name);
 				typeColClass.push_back(type);
-
+				categoryColClass.push_back(NONE);
 				++staticCounterC;
 			}
 		}
@@ -621,7 +647,7 @@ public:
 				indexColMethod.push_back(IndexOf(name));
 				nameColMethod.push_back(name);
 				typeColMethod.push_back(type);
-
+				categoryColMethod.push_back(NONE);
 				++argCounterM;
 			}
 			else
@@ -630,7 +656,7 @@ public:
 				indexColClass.push_back(IndexOf(name));
 				nameColClass.push_back(name);
 				typeColClass.push_back(type);
-
+				categoryColClass.push_back(NONE);
 				++argCounterC;
 			}
 		}
@@ -642,7 +668,7 @@ public:
 				indexColMethod.push_back(IndexOf(name));
 				nameColMethod.push_back(name);
 				typeColMethod.push_back(type);
-
+				categoryColMethod.push_back(OBJECT);
 				++fieldCounterM;
 			}
 			else
@@ -651,7 +677,7 @@ public:
 				indexColClass.push_back(IndexOf(name));
 				nameColClass.push_back(name);
 				typeColClass.push_back(type);
-
+				categoryColClass.push_back(OBJECT);
 				++fieldCounterC;
 			}
 		}
@@ -931,6 +957,14 @@ public:
 		outputFileStream << "<subroutineDec>" << endl;		// <subroutineDec>
 		writeKeyword(J->tokenString[tokenCount]);			// <keyword> constructor/method/function
 		functionType = J->tokenString[tokenCount];
+		if (functionType == "method")
+		{
+			symbolTable.kindColMethod.push_back(ARG);
+			symbolTable.indexColMethod.push_back(0);
+			symbolTable.nameColMethod.push_back(symbolTable.currentSubName);
+			symbolTable.typeColMethod.push_back("method");
+			++symbolTable.argCounterM;
+		}
 		++tokenCount;
 		if (J->tokenList[tokenCount] == KEYWORD)
 		{
@@ -1175,8 +1209,15 @@ public:
 			symbolTable.currentKind = symbolTable.KindOf(J->tokenString[tokenCount]);
 			outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
 			symbolTable.currentSubName = symbolTable.TypeOf(J->tokenString[tokenCount]);
-			VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(J->tokenString[tokenCount])); // needs to push
-			if (symbolTable.currentKind == VAR)
+			if (symbolTable.isObject(J->tokenString[tokenCount]))
+			{
+				VMWriter.writePush(THISseg, symbolTable.IndexOf(J->tokenString[tokenCount])); // needs to push
+			}
+			else
+			{
+				VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(J->tokenString[tokenCount])); // needs to push
+			}
+			if (symbolTable.isObject(J->tokenString[tokenCount]))//if (symbolTable.currentKind == VAR)
 			{
 				++argCount; // If VAR, then we are dealing with an object and need to increment arg to account for "THIS"
 			}
@@ -1187,12 +1228,13 @@ public:
 		{
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 			++tokenCount;
-			CompileExpressionList();							// calls expression list
 			if (symbolTable.currentCategory == OBJECT)
 			{
 				VMWriter.writePush(POINTERseg, 0);
+				++argCount;
 			}
-			VMWriter.writeCall(symbolTable.currentSubName, 1); // need fix for nArgs
+			CompileExpressionList();							// calls expression list
+			VMWriter.writeCall(symbolTable.currentSubName, argCount); // need fix for nArgs
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 			++tokenCount;
 		}
@@ -1208,6 +1250,11 @@ public:
 			++tokenCount;
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 			++tokenCount;
+			if (symbolTable.currentCategory == OBJECT)
+			{
+				//VMWriter.writePush(POINTERseg, 0);
+				//++argCount;
+			}
 			CompileExpressionList();							// calls expression list
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
 			VMWriter.writeCall(symbolTable.currentSubName, argCount); // need check for nArgs
@@ -1365,9 +1412,13 @@ public:
 			CompileStatements();								// print the statements
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> }
 			++tokenCount;
+			VMWriter.writeLabel("IF_END" + to_string(labelCountVector.back()));  // L1// print the statements
 		}
-		else;
-		VMWriter.writeLabel("IF_END" + to_string(labelCountVector.back()));  // L1// print the statements
+		else
+		{
+			VMWriter.writeLabel("IF_FALSE" + to_string(labelCountVector.back()));  // L1// print the statements
+		}
+
 		labelCountVector.pop_back();
 		outputFileStream << "</ifStatement>" << endl;			// </ifStatement>
 	}
@@ -1549,12 +1600,14 @@ public:
 				// Symbol table state definition
 				symbolTable.checkDefined(J->tokenString[tokenCount]);
 				symbolTable.currentVarName = J->tokenString[tokenCount];
+				
 				if (symbolTable.beingDefined)
 				{
 					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(CLASS) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
 				}
 				else
 				{
+					symbolTable.currentTypeOf = symbolTable.TypeOf(J->tokenString[tokenCount]);
 					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintCategory(J->tokenString[tokenCount]) << " , " << symbolTable.IndexOf(J->tokenString[tokenCount]) << " , " << symbolTable.printbeingDefined << ")" << endl;
 				}
 				// End symbol table state definition
@@ -1604,7 +1657,18 @@ public:
 					writeIdentifier(J->tokenString[tokenCount]);		// <identifer> subroutineName
 					// Symbol table state definition
 					outputFileStream << "(" << J->tokenString[tokenCount] << " , " << symbolTable.PrintClassOrSub(SUBROUTINE) << " , " << "No Index" << " , " << "CLASS/SUB-notdefined" << ")" << endl;
-					symbolTable.currentSubName = symbolTable.currentVarName + "." + J->tokenString[tokenCount];
+					symbolTable.checkDefined(J->tokenString[tokenCount - 2]);
+					if (!symbolTable.beingDefined)
+					{
+						symbolTable.currentSubName = symbolTable.currentTypeOf + "." + J->tokenString[tokenCount]; // gets called if the current subroutine is being acted on an object
+						VMWriter.writePush(THISseg, symbolTable.IndexOf(symbolTable.currentVarName)); // needs to push
+						++argCount;
+					}
+					else
+					{
+						symbolTable.currentSubName = symbolTable.currentVarName + "." + J->tokenString[tokenCount];
+					}
+					
 
 					// End symbol table state definition
 					++tokenCount;
@@ -1652,7 +1716,6 @@ public:
 		outputFileStream << "<expressionList>" << endl;
 		if (J->tokenString[tokenCount] == ")")
 		{
-
 		}
 		else
 		{
