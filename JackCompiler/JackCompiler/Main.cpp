@@ -1217,10 +1217,10 @@ public:
 			{
 				VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(J->tokenString[tokenCount])); // needs to push
 			}
-			if (symbolTable.isObject(J->tokenString[tokenCount]))//if (symbolTable.currentKind == VAR)
-			{
-				++argCount; // If VAR, then we are dealing with an object and need to increment arg to account for "THIS"
-			}
+			//if (symbolTable.isObject(J->tokenString[tokenCount]))//if (symbolTable.currentKind == VAR)
+			//{
+			//	++argCount; // If VAR, then we are dealing with an object and need to increment arg to account for "THIS"
+			//}
 		}
 		// End symbol table state definition
 		++tokenCount;
@@ -1250,10 +1250,10 @@ public:
 			++tokenCount;
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 			++tokenCount;
-			if (symbolTable.currentCategory == OBJECT)
+			symbolTable.checkDefined(J->tokenString[tokenCount - 4]); // if this is a defined object, increment the arg counter to account for "THIS" 
+			if (!symbolTable.beingDefined)
 			{
-				//VMWriter.writePush(POINTERseg, 0);
-				//++argCount;
+				++argCount;
 			}
 			CompileExpressionList();							// calls expression list
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
@@ -1716,6 +1716,7 @@ public:
 		outputFileStream << "<expressionList>" << endl;
 		if (J->tokenString[tokenCount] == ")")
 		{
+
 		}
 		else
 		{
