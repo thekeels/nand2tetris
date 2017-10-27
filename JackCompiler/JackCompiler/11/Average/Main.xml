@@ -1,0 +1,253 @@
+<class>
+<keyword> class </keyword>
+<identifier> Main </identifier>
+(Main , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> { </symbol>
+<subroutineDec>
+<keyword> function </keyword>
+<keyword> void </keyword>
+<identifier> main </identifier>
+(main , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<varDec>
+<keyword> var </keyword>
+<identifier> Array </identifier>
+(Array , CLASS , No Index , CLASS/SUB-notdefined)
+<identifier> a </identifier>
+(a , VAR , 0 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<varDec>
+<keyword> var </keyword>
+<keyword> int </keyword>
+<identifier> length </identifier>
+(length , VAR , 1 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<varDec>
+<keyword> var </keyword>
+<keyword> int </keyword>
+<identifier> i </identifier>
+(i , VAR , 2 , beingDefined)
+<symbol> , </symbol>
+<identifier> sum </identifier>
+(sum , VAR , 3 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> length </identifier>
+(length , VAR , 1 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Keyboard </identifier>
+(Keyboard , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> readInt </identifier>
+(readInt , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<stringConstant> How many numbers?  </stringConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> a </identifier>
+(a , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Array </identifier>
+(Array , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> new </identifier>
+(new , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> length </identifier>
+(length , VAR , 1 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> i </identifier>
+(i , VAR , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<whileStatement>
+<keyword> while </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> i </identifier>
+(i , VAR , 2 , beingUsed)
+</term>
+<symbol> &lt; </symbol>
+<term>
+<identifier> length </identifier>
+(length , VAR , 1 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> a </identifier>
+(a , VAR , 0 , beingUsed)
+<symbol> [ </symbol>
+<expression>
+<term>
+<identifier> i </identifier>
+(i , VAR , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ] </symbol>
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Keyboard </identifier>
+(Keyboard , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> readInt </identifier>
+(readInt , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<stringConstant> Enter a number:  </stringConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> sum </identifier>
+(sum , VAR , 3 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> sum </identifier>
+(sum , VAR , 3 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> a </identifier>
+(a , VAR , 0 , beingUsed)
+<symbol> [ </symbol>
+<expression>
+<term>
+<identifier> i </identifier>
+(i , VAR , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ] </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> i </identifier>
+(i , VAR , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> i </identifier>
+(i , VAR , 2 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+</statements>
+<symbol> } </symbol>
+</whileStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Output </identifier>
+(Output , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> printString </identifier>
+(printString , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<stringConstant> The average is  </stringConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Output </identifier>
+(Output , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> printInt </identifier>
+(printInt , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> sum </identifier>
+(sum , VAR , 3 , beingUsed)
+</term>
+<symbol> / </symbol>
+<term>
+<identifier> length </identifier>
+(length , VAR , 1 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<symbol> } </symbol>
+</class>

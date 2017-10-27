@@ -1,0 +1,1421 @@
+<class>
+<keyword> class </keyword>
+<identifier> PongGame </identifier>
+(PongGame , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> { </symbol>
+<classVarDec>
+<keyword> static </keyword>
+<identifier> PongGame </identifier>
+(PongGame , CLASS , No Index , CLASS/SUB-notdefined)
+<identifier> instance </identifier>
+(instance , STATIC , 0 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<classVarDec>
+<keyword> field </keyword>
+<identifier> Bat </identifier>
+(Bat , CLASS , No Index , CLASS/SUB-notdefined)
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<classVarDec>
+<keyword> field </keyword>
+<identifier> Ball </identifier>
+(Ball , CLASS , No Index , CLASS/SUB-notdefined)
+<identifier> ball </identifier>
+(ball , FIELD , 1 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<classVarDec>
+<keyword> field </keyword>
+<keyword> int </keyword>
+<identifier> wall </identifier>
+(wall , FIELD , 2 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<classVarDec>
+<keyword> field </keyword>
+<keyword> boolean </keyword>
+<identifier> exit </identifier>
+(exit , FIELD , 3 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<classVarDec>
+<keyword> field </keyword>
+<keyword> int </keyword>
+<identifier> score </identifier>
+(score , FIELD , 4 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<classVarDec>
+<keyword> field </keyword>
+<keyword> int </keyword>
+<identifier> lastWall </identifier>
+(lastWall , FIELD , 5 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<classVarDec>
+<keyword> field </keyword>
+<keyword> int </keyword>
+<identifier> batWidth </identifier>
+(batWidth , FIELD , 6 , beingDefined)
+<symbol> ; </symbol>
+</classVarDec>
+<subroutineDec>
+<keyword> constructor </keyword>
+<identifier> PongGame </identifier>
+(PongGame , CLASS , No Index , CLASS/SUB-notdefined)
+<identifier> new </identifier>
+(new , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> clearScreen </identifier>
+(clearScreen , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> batWidth </identifier>
+(batWidth , FIELD , 6 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<integerConstant> 50 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Bat </identifier>
+(Bat , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> new </identifier>
+(new , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 230 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 229 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> batWidth </identifier>
+(batWidth , FIELD , 6 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 7 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> ball </identifier>
+(ball , FIELD , 1 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Ball </identifier>
+(Ball , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> new </identifier>
+(new , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 253 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 222 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 511 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 229 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> ball </identifier>
+(ball , FIELD , 1 , beingUsed)
+<symbol> . </symbol>
+<identifier> setDestination </identifier>
+(setDestination , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 400 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Screen </identifier>
+(Screen , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> drawRectangle </identifier>
+(drawRectangle , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 238 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 511 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 240 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Output </identifier>
+(Output , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> moveCursor </identifier>
+(moveCursor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 22 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Output </identifier>
+(Output , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> printString </identifier>
+(printString , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<stringConstant> Score: 0 </stringConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> exit </identifier>
+(exit , FIELD , 3 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<keyword> false </keyword>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> score </identifier>
+(score , FIELD , 4 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> wall </identifier>
+(wall , FIELD , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> lastWall </identifier>
+(lastWall , FIELD , 5 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<returnStatement>
+<keyword> return </keyword>
+<expression>
+<term>
+<keyword> this </keyword>
+</term>
+</expression>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> dispose </identifier>
+(dispose , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> dispose </identifier>
+(dispose , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> ball </identifier>
+(ball , FIELD , 1 , beingUsed)
+<symbol> . </symbol>
+<identifier> dispose </identifier>
+(dispose , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Memory </identifier>
+(Memory , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> deAlloc </identifier>
+(deAlloc , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<keyword> this </keyword>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> function </keyword>
+<keyword> void </keyword>
+<identifier> newInstance </identifier>
+(newInstance , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> instance </identifier>
+(instance , STATIC , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> PongGame </identifier>
+(PongGame , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> new </identifier>
+(new , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> function </keyword>
+<identifier> PongGame </identifier>
+(PongGame , CLASS , No Index , CLASS/SUB-notdefined)
+<identifier> getInstance </identifier>
+(getInstance , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<returnStatement>
+<keyword> return </keyword>
+<expression>
+<term>
+<identifier> instance </identifier>
+(instance , STATIC , 0 , beingUsed)
+</term>
+</expression>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> run </identifier>
+(run , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<varDec>
+<keyword> var </keyword>
+<keyword> char </keyword>
+<identifier> key </identifier>
+(key , VAR , 0 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<statements>
+<whileStatement>
+<keyword> while </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ~ </symbol>
+<term>
+<identifier> exit </identifier>
+(exit , FIELD , 3 , beingUsed)
+</term>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<whileStatement>
+<keyword> while </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> key </identifier>
+(key , VAR , 0 , beingUsed)
+</term>
+<symbol> = </symbol>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> &amp; </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ~ </symbol>
+<term>
+<identifier> exit </identifier>
+(exit , FIELD , 3 , beingUsed)
+</term>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> key </identifier>
+(key , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Keyboard </identifier>
+(Keyboard , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> keyPressed </identifier>
+(keyPressed , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> move </identifier>
+(move , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> moveBall </identifier>
+(moveBall , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Sys </identifier>
+(Sys , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> wait </identifier>
+(wait , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 50 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</whileStatement>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> key </identifier>
+(key , VAR , 0 , beingUsed)
+</term>
+<symbol> = </symbol>
+<term>
+<integerConstant> 130 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> setDirection </identifier>
+(setDirection , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+<keyword> else </keyword>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> key </identifier>
+(key , VAR , 0 , beingUsed)
+</term>
+<symbol> = </symbol>
+<term>
+<integerConstant> 132 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> setDirection </identifier>
+(setDirection , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+<keyword> else </keyword>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> key </identifier>
+(key , VAR , 0 , beingUsed)
+</term>
+<symbol> = </symbol>
+<term>
+<integerConstant> 140 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> exit </identifier>
+(exit , FIELD , 3 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<keyword> true </keyword>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<whileStatement>
+<keyword> while </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ~ </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> key </identifier>
+(key , VAR , 0 , beingUsed)
+</term>
+<symbol> = </symbol>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> &amp; </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ~ </symbol>
+<term>
+<identifier> exit </identifier>
+(exit , FIELD , 3 , beingUsed)
+</term>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> key </identifier>
+(key , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Keyboard </identifier>
+(Keyboard , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> keyPressed </identifier>
+(keyPressed , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> move </identifier>
+(move , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> moveBall </identifier>
+(moveBall , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Sys </identifier>
+(Sys , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> wait </identifier>
+(wait , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 50 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</whileStatement>
+</statements>
+<symbol> } </symbol>
+</whileStatement>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> exit </identifier>
+(exit , FIELD , 3 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Output </identifier>
+(Output , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> moveCursor </identifier>
+(moveCursor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 10 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 27 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Output </identifier>
+(Output , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> printString </identifier>
+(printString , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<stringConstant> Game Over </stringConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> method </keyword>
+<keyword> void </keyword>
+<identifier> moveBall </identifier>
+(moveBall , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<varDec>
+<keyword> var </keyword>
+<keyword> int </keyword>
+<identifier> bouncingDirection </identifier>
+(bouncingDirection , VAR , 0 , beingDefined)
+<symbol> , </symbol>
+<identifier> batLeft </identifier>
+(batLeft , VAR , 1 , beingDefined)
+<symbol> , </symbol>
+<identifier> batRight </identifier>
+(batRight , VAR , 2 , beingDefined)
+<symbol> , </symbol>
+<identifier> ballLeft </identifier>
+(ballLeft , VAR , 3 , beingDefined)
+<symbol> , </symbol>
+<identifier> ballRight </identifier>
+(ballRight , VAR , 4 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> wall </identifier>
+(wall , FIELD , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> ball </identifier>
+(ball , FIELD , 1 , beingUsed)
+<symbol> . </symbol>
+<identifier> move </identifier>
+(move , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> wall </identifier>
+(wall , FIELD , 2 , beingUsed)
+</term>
+<symbol> &gt; </symbol>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> &amp; </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ~ </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> wall </identifier>
+(wall , FIELD , 2 , beingUsed)
+</term>
+<symbol> = </symbol>
+<term>
+<identifier> lastWall </identifier>
+(lastWall , FIELD , 5 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> lastWall </identifier>
+(lastWall , FIELD , 5 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> wall </identifier>
+(wall , FIELD , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> bouncingDirection </identifier>
+(bouncingDirection , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> batLeft </identifier>
+(batLeft , VAR , 1 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> getLeft </identifier>
+(getLeft , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> batRight </identifier>
+(batRight , VAR , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> getRight </identifier>
+(getRight , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> ballLeft </identifier>
+(ballLeft , VAR , 3 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> ball </identifier>
+(ball , FIELD , 1 , beingUsed)
+<symbol> . </symbol>
+<identifier> getLeft </identifier>
+(getLeft , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> ballRight </identifier>
+(ballRight , VAR , 4 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> ball </identifier>
+(ball , FIELD , 1 , beingUsed)
+<symbol> . </symbol>
+<identifier> getRight </identifier>
+(getRight , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> wall </identifier>
+(wall , FIELD , 2 , beingUsed)
+</term>
+<symbol> = </symbol>
+<term>
+<integerConstant> 4 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> exit </identifier>
+(exit , FIELD , 3 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> batLeft </identifier>
+(batLeft , VAR , 1 , beingUsed)
+</term>
+<symbol> &gt; </symbol>
+<term>
+<identifier> ballRight </identifier>
+(ballRight , VAR , 4 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> | </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> batRight </identifier>
+(batRight , VAR , 2 , beingUsed)
+</term>
+<symbol> &lt; </symbol>
+<term>
+<identifier> ballLeft </identifier>
+(ballLeft , VAR , 3 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ~ </symbol>
+<term>
+<identifier> exit </identifier>
+(exit , FIELD , 3 , beingUsed)
+</term>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> ballRight </identifier>
+(ballRight , VAR , 4 , beingUsed)
+</term>
+<symbol> &lt; </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> batLeft </identifier>
+(batLeft , VAR , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 10 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> bouncingDirection </identifier>
+(bouncingDirection , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+</statements>
+<symbol> } </symbol>
+<keyword> else </keyword>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> ballLeft </identifier>
+(ballLeft , VAR , 3 , beingUsed)
+</term>
+<symbol> &gt; </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> batRight </identifier>
+(batRight , VAR , 2 , beingUsed)
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 10 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> bouncingDirection </identifier>
+(bouncingDirection , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> batWidth </identifier>
+(batWidth , FIELD , 6 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> batWidth </identifier>
+(batWidth , FIELD , 6 , beingUsed)
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> bat </identifier>
+(bat , FIELD , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> setWidth </identifier>
+(setWidth , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> batWidth </identifier>
+(batWidth , FIELD , 6 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> score </identifier>
+(score , FIELD , 4 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> score </identifier>
+(score , FIELD , 4 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Output </identifier>
+(Output , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> moveCursor </identifier>
+(moveCursor , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 22 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 7 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Output </identifier>
+(Output , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> printInt </identifier>
+(printInt , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> score </identifier>
+(score , FIELD , 4 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> ball </identifier>
+(ball , FIELD , 1 , beingUsed)
+<symbol> . </symbol>
+<identifier> bounce </identifier>
+(bounce , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> bouncingDirection </identifier>
+(bouncingDirection , VAR , 0 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<symbol> } </symbol>
+</class>

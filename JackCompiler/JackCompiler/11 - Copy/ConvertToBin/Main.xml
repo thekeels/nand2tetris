@@ -1,0 +1,544 @@
+<class>
+<keyword> class </keyword>
+<identifier> Main </identifier>
+(Main , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> { </symbol>
+<subroutineDec>
+<keyword> function </keyword>
+<keyword> void </keyword>
+<identifier> main </identifier>
+(main , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<varDec>
+<keyword> var </keyword>
+<keyword> int </keyword>
+<identifier> value </identifier>
+(value , VAR , 0 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Main </identifier>
+(Main , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> fillMemory </identifier>
+(fillMemory , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 8001 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 16 </integerConstant>
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> value </identifier>
+(value , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Memory </identifier>
+(Memory , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> peek </identifier>
+(peek , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 8000 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Main </identifier>
+(Main , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> convert </identifier>
+(convert , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> value </identifier>
+(value , VAR , 0 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> function </keyword>
+<keyword> void </keyword>
+<identifier> convert </identifier>
+(convert , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+<keyword> int </keyword>
+<identifier> value </identifier>
+(value , ARG , 0 , beingDefined)
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<varDec>
+<keyword> var </keyword>
+<keyword> int </keyword>
+<identifier> mask </identifier>
+(mask , VAR , 0 , beingDefined)
+<symbol> , </symbol>
+<identifier> position </identifier>
+(position , VAR , 1 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<varDec>
+<keyword> var </keyword>
+<keyword> boolean </keyword>
+<identifier> loop </identifier>
+(loop , VAR , 2 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> loop </identifier>
+(loop , VAR , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<keyword> true </keyword>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<whileStatement>
+<keyword> while </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> loop </identifier>
+(loop , VAR , 2 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> position </identifier>
+(position , VAR , 1 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> position </identifier>
+(position , VAR , 1 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> mask </identifier>
+(mask , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> Main </identifier>
+(Main , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> nextMask </identifier>
+(nextMask , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> mask </identifier>
+(mask , VAR , 0 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ~ </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> position </identifier>
+(position , VAR , 1 , beingUsed)
+</term>
+<symbol> &gt; </symbol>
+<term>
+<integerConstant> 16 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ~ </symbol>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> value </identifier>
+(value , ARG , 0 , beingUsed)
+</term>
+<symbol> &amp; </symbol>
+<term>
+<identifier> mask </identifier>
+(mask , VAR , 0 , beingUsed)
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+<symbol> = </symbol>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+</term>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Memory </identifier>
+(Memory , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> poke </identifier>
+(poke , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 8000 </integerConstant>
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> position </identifier>
+(position , VAR , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+<keyword> else </keyword>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Memory </identifier>
+(Memory , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> poke </identifier>
+(poke , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<integerConstant> 8000 </integerConstant>
+</term>
+<symbol> + </symbol>
+<term>
+<identifier> position </identifier>
+(position , VAR , 1 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+</statements>
+<symbol> } </symbol>
+<keyword> else </keyword>
+<symbol> { </symbol>
+<statements>
+<letStatement>
+<keyword> let </keyword>
+<identifier> loop </identifier>
+(loop , VAR , 2 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<keyword> false </keyword>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+</statements>
+<symbol> } </symbol>
+</whileStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> function </keyword>
+<keyword> int </keyword>
+<identifier> nextMask </identifier>
+(nextMask , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+<keyword> int </keyword>
+<identifier> mask </identifier>
+(mask , ARG , 0 , beingDefined)
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<ifStatement>
+<keyword> if </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> mask </identifier>
+(mask , ARG , 0 , beingUsed)
+</term>
+<symbol> = </symbol>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<returnStatement>
+<keyword> return </keyword>
+<expression>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+<keyword> else </keyword>
+<symbol> { </symbol>
+<statements>
+<returnStatement>
+<keyword> return </keyword>
+<expression>
+<term>
+<identifier> mask </identifier>
+(mask , ARG , 0 , beingUsed)
+</term>
+<symbol> * </symbol>
+<term>
+<integerConstant> 2 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</ifStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<subroutineDec>
+<keyword> function </keyword>
+<keyword> void </keyword>
+<identifier> fillMemory </identifier>
+(fillMemory , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+<keyword> int </keyword>
+<identifier> startAddress </identifier>
+(startAddress , ARG , 0 , beingDefined)
+<symbol> , </symbol>
+<keyword> int </keyword>
+<identifier> length </identifier>
+(length , ARG , 1 , beingDefined)
+<symbol> , </symbol>
+<keyword> int </keyword>
+<identifier> value </identifier>
+(value , ARG , 2 , beingDefined)
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<statements>
+<whileStatement>
+<keyword> while </keyword>
+<symbol> ( </symbol>
+<expression>
+<term>
+<identifier> length </identifier>
+(length , ARG , 1 , beingUsed)
+</term>
+<symbol> &gt; </symbol>
+<term>
+<integerConstant> 0 </integerConstant>
+</term>
+</expression>
+<symbol> ) </symbol>
+<symbol> { </symbol>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> Memory </identifier>
+(Memory , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> poke </identifier>
+(poke , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+<expression>
+<term>
+<identifier> startAddress </identifier>
+(startAddress , ARG , 0 , beingUsed)
+</term>
+</expression>
+<symbol> , </symbol>
+<expression>
+<term>
+<identifier> value </identifier>
+(value , ARG , 2 , beingUsed)
+</term>
+</expression>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> length </identifier>
+(length , ARG , 1 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> length </identifier>
+(length , ARG , 1 , beingUsed)
+</term>
+<symbol> - </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> startAddress </identifier>
+(startAddress , ARG , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> startAddress </identifier>
+(startAddress , ARG , 0 , beingUsed)
+</term>
+<symbol> + </symbol>
+<term>
+<integerConstant> 1 </integerConstant>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+</statements>
+<symbol> } </symbol>
+</whileStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<symbol> } </symbol>
+</class>

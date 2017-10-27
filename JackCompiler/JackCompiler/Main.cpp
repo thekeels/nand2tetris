@@ -252,6 +252,8 @@ class VMWriter
 public:
 	//string staticVariable;
 	segmentType currentSegment;
+	int currentArrayIndex;
+	segmentType currentArraySegment;
 	VMWriter() {}
 	VMWriter(string directory, string filename)
 	{
@@ -1296,11 +1298,17 @@ public:
 			string arrayName = J->tokenString[tokenCount - 1];
 			writeSymbol(J->tokenString[tokenCount]);			// <symbol> [
 			++tokenCount;
+			opType = "[lvalue";
+			expressionOPVector.push_back(opType); // array operation necessary here --- should this be before CompileExpression??
 			CompileExpression();								// print the expression
-			writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
 			VMWriter.findSegment(symbolTable.KindOf(arrayName));
-			VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(arrayName)); // need to push base adress of array
-			VMWriter.writeArithmetic(ADD);
+			VMWriter.currentArrayIndex = symbolTable.IndexOf(arrayName);
+			VMWriter.currentArraySegment = VMWriter.currentSegment;
+			ExecuteExpression();
+			writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
+			//VMWriter.findSegment(symbolTable.KindOf(arrayName));
+			//VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(arrayName)); // need to push base adress of array
+			//VMWriter.writeArithmetic(ADD);
 			++tokenCount;
 			letArray = true;
 		}
@@ -1442,7 +1450,13 @@ public:
 				break;
 			}
 		}
-		ExecuteExpression();
+		if (J->tokenString[tokenCount] == "]")
+		{
+		}
+		else
+		{
+			ExecuteExpression();
+		}
 	}
 	void ExecuteExpression()
 	{
@@ -1495,10 +1509,21 @@ public:
 			}
 			else if (currentOp == "[")
 			{
+				VMWriter.writePush(VMWriter.currentArraySegment, VMWriter.currentArrayIndex); // need to push base adress of array
+				VMWriter.writeArithmetic(ADD); // add base array to evaluated expression
+
 				VMWriter.writePop(POINTERseg,1);
 				VMWriter.writePush(THATseg, 0);
 			}
-			else;
+			else if (currentOp == "[lvalue")
+			{
+				VMWriter.writePush(VMWriter.currentArraySegment, VMWriter.currentArrayIndex); // need to push base adress of array
+				VMWriter.writeArithmetic(ADD); // add base array to evaluated expression
+
+				//VMWriter.writePop(POINTERseg, 1);
+				//VMWriter.writePush(THATseg, 0);
+			}
+			else; // FUNCTION
 			expressionOPVector.pop_back();
 		}
 			
@@ -1648,8 +1673,8 @@ public:
 						++tokenCount;
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 						++tokenCount;
-						//opType = "";
-						//expressionOPVector.push_back(opType); // blank operation necessary here to delay the evaluation of the expression until function expression is loaded
+						opType = "Function";
+						expressionOPVector.push_back(opType); // blank operation necessary here to delay the evaluation of the expression until function expression is loaded
 						CompileExpressionList();							// calls expression list
 						VMWriter.writeCall(symbolTable.currentSubName, argCount); // need fix for nArgs
 						writeSymbol(J->tokenString[tokenCount]);			// <symbol> )
@@ -1681,7 +1706,7 @@ public:
 					++tokenCount;
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> (
 					++tokenCount;
-					opType = "";
+					opType = "FUNCTION";
 					expressionOPVector.push_back(opType); // blank operation necessary here to delay the evaluation of the expression until function expression is loaded
 					CompileExpressionList();							// calls expression list
 					VMWriter.writeCall(symbolTable.currentSubName, argCount); // need fix for nArgs
@@ -1699,16 +1724,25 @@ public:
 					string arrayName = J->tokenString[tokenCount - 1];
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> [
 					++tokenCount;
-					opType = ""
-					expressionOPVector.push_back(opType); // blank operation necessary here to delay the evaluation of the expression
+					//opType = "";
+					//expressionOPVector.push_back(opType); // blank operation necessary here to delay the evaluation of the expression
+					opType = "[";
+					expressionOPVector.push_back(opType); // array operation necessary here --- should this be before CompileExpression??
 					CompileExpression();								// print the expression
 					VMWriter.findSegment(symbolTable.KindOf(arrayName));
-					VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(arrayName)); // need to push base adress of array
-					VMWriter.writeArithmetic(ADD); // add base array to evaluated expression
-					opType = "[";
-					expressionOPVector.push_back(opType); // array operation necessary here
+					VMWriter.currentArrayIndex = symbolTable.IndexOf(arrayName);
+					VMWriter.currentArraySegment = VMWriter.currentSegment;
+					//VMWriter.writePush(VMWriter.currentSegment, symbolTable.IndexOf(arrayName)); // need to push base adress of array
+					//VMWriter.writeArithmetic(ADD); // add base array to evaluated expression
+					//opType = "[";
+					//expressionOPVector.push_back(opType); // array operation necessary here --- should this be before CompileExpression??
 					writeSymbol(J->tokenString[tokenCount]);			// <symbol> ]
-					ExecuteExpression(); // need to execute the array operation here?
+					while(expressionOPVector.back() != "[")
+					{ 
+						ExecuteExpression(); // Execute expression until Array indication "[" is reached
+					}
+					ExecuteExpression(); // Execute the Array syntax
+
 					++tokenCount;
 				}
 				else 

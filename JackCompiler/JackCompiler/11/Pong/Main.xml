@@ -1,0 +1,94 @@
+<class>
+<keyword> class </keyword>
+<identifier> Main </identifier>
+(Main , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> { </symbol>
+<subroutineDec>
+<keyword> function </keyword>
+<keyword> void </keyword>
+<identifier> main </identifier>
+(main , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<parameterList>
+</parameterList>
+<symbol> ) </symbol>
+<subroutineBody>
+<symbol> { </symbol>
+<varDec>
+<keyword> var </keyword>
+<identifier> PongGame </identifier>
+(PongGame , CLASS , No Index , CLASS/SUB-notdefined)
+<identifier> game </identifier>
+(game , VAR , 0 , beingDefined)
+<symbol> ; </symbol>
+</varDec>
+<statements>
+<doStatement>
+<keyword> do </keyword>
+<identifier> PongGame </identifier>
+(PongGame , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> newInstance </identifier>
+(newInstance , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<letStatement>
+<keyword> let </keyword>
+<identifier> game </identifier>
+(game , VAR , 0 , beingUsed)
+<symbol> = </symbol>
+<expression>
+<term>
+<identifier> PongGame </identifier>
+(PongGame , CLASS , No Index , CLASS/SUB-notdefined)
+<symbol> . </symbol>
+<identifier> getInstance </identifier>
+(getInstance , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+</term>
+</expression>
+<symbol> ; </symbol>
+</letStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> game </identifier>
+(game , VAR , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> run </identifier>
+(run , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<doStatement>
+<keyword> do </keyword>
+<identifier> game </identifier>
+(game , VAR , 0 , beingUsed)
+<symbol> . </symbol>
+<identifier> dispose </identifier>
+(dispose , SUBROUTINE , No Index , CLASS/SUB-notdefined)
+<symbol> ( </symbol>
+<expressionList>
+</expressionList>
+<symbol> ) </symbol>
+<symbol> ; </symbol>
+</doStatement>
+<returnStatement>
+<keyword> return </keyword>
+<symbol> ; </symbol>
+</returnStatement>
+</statements>
+<symbol> } </symbol>
+</subroutineBody>
+</subroutineDec>
+<symbol> } </symbol>
+</class>
