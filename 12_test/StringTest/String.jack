@@ -12,14 +12,20 @@
  */
 class String {
 	field Array newString;
-	field int length;
+	field int len;
+	// field int maxLen;
 
     /** constructs a new empty string with a maximum length of maxLength
      *  and initial length of 0. */
     constructor String new(int maxLength) {
 	var int count;
-	let length = 0;
+	let len = 1;
+	if(maxLength = 0)
+	{
+		let maxLength = maxLength + 1;
+	}
 	let newString = Array.new(maxLength);
+	let count = 0;
 	while (count < maxLength)
 	{
 		let newString[count] = 0;
@@ -36,96 +42,95 @@ class String {
 
     /** Returns the current length of this string. */
     method int length() {
-	var Array thisArray;
-	var int count, maxLength;
-	let thisArray = this;
-	let count = 0;
-	// let maxLength = thisArray[-1];
-	while ( ~thisArray[count])
-		{
-			let count = count + 1;
-		}
-	return count;
+	return len-1;
     }
 
     /** Returns the character at the j-th location of this string. */
     method char charAt(int j) {
 	var int character;
-	var Array thisArray;
-	let thisArray = this;
-	let character = thisArray[j];
+	let character = newString[j];
 	return character;
     }
 
     /** Sets the character at the j-th location of this string to c. */
     method void setCharAt(int j, char c) {
-	var Array thisArray;
-	let thisArray = this;
-	let thisArray[j] = c;
+	let newString[j] = c;
 	return;
     }
 
     /** Appends c to this string's end and returns this string. */
     method String appendChar(char c) {
-	var int stringLength;
-	var Array thisArray;
-	let thisArray = this;
-	let stringLength = length();
-	if(stringLength = 0) 
-	{ }
-	else 
+	if(len = 0) 
 	{ 
-		let thisArray[stringLength] = c;
+		let len = len + 1;
 	}
+	
+	let newString[len-1] = c;
+	let len = len + 1;
+	
 	return this;
     }
 
     /** Erases the last character from this string. */
     method void eraseLastChar() {
-	var int stringLength;
-	var Array thisArray;
-	let thisArray = this;
-	let stringLength = length();
-	if(stringLength = 0) 
-	{ }
-	else 
-	{ 
-		let thisArray[stringLength] = 0;
-	}
+
+	let newString[len-1] = 0;
+	let len = len - 1;
+	
 	return;
     }
 
     /** Returns the integer value of this string, 
      *  until a non-digit character is detected. */
     method int intValue() {
-	var int i, v, d;
-	var Array thisArray;
-	let thisArray = this;
+	var int i, v, d, neg;
 	let v = 0;
-	let i = 0;
-	while (i < length())
+	let i = 1;
+	let neg = 1;
+	while (i < len)
 		{
-			let d = thisArray[i] - 48;
-			let v = v * 10 + d;
-			let i = i + 1;
+			if(newString[i-1] = 45)
+			{
+				let neg = -1;
+				let i = i + 1;
+			}
+			else
+			{
+				let d = newString[i-1] - 48;
+				let v = v * 10 + d;
+				let i = i + 1;
+			}
 		}
+	let v = v * neg;
 	return v;
     }
 
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
 	var int lastDigit, nDiv10;
+	var int c, count;
+	let count = 0;
+	let len = 1;
 	let nDiv10 = Math.divide(val,10);
-	let lastDigit = val - (nDiv10 * val) + 48;
-	if (lastDigit < 10)
+
+	if (Math.abs(val) < 10)
 	{
-		do appendChar(lastDigit);
-		return;
+		if(val<0)
+		{
+			do appendChar(45);
+		}
+
+		let c = Math.abs(val) + 48;
+		do appendChar(c);
 	}
 	else
 	{
-		do setInt(nDiv10);
-		 
+
+	let lastDigit = Math.abs(val) - (Math.abs(nDiv10) * 10);		
+	let c = lastDigit + 48;
+	do setInt(nDiv10);
+	do appendChar(c);
+
 	}
 	return;
     }
