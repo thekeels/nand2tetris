@@ -33,21 +33,23 @@ class Memory {
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
-	var Array segment;
+	var Array segment, block;
 	var int pointer;
-	let segment = freeList[2049];
-	if( size < segment[-1] )
+	let segment = freeList[2048];
+	if( size + 1 < segment[0] )
 	{
-		let segment[0] = freeList[segment[0];
-		let segment[0] = size;
-		let segment[size] = 
-		let segment[-2] = segment[
+		let block = segment[0] - (size + 1);
+		let block[0] = segment[1] + 1;
+		let block[1] = size + 1;
+		let freeList[segment[1] + size] = segment[0] - (size + 1);
+		let segment[0] = freeList[segment[1] + size] - segment[0];
+		let segment[1] = segment[1] + (size + 1);
 	}
 	else 
 	{
-		let segment = freeList[segment[1]];
+		
 	}
-	let pointer = segment[1];
+	let pointer = freeList[block[0]];
 	return pointer;
     }
 
