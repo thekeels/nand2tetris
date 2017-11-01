@@ -303,15 +303,16 @@ class Output {
 	{
 		let column = column - 1;
 	}
-	do Screen.setColor(true);
+	do Screen.setColor(false);
 	while(x<8)
 	{	
 		while (y < 11)
 		{
-		do Screen.drawPixel(column*x + 7 , row*11 + y);
+		do Screen.drawPixel(column*8 + x , row*11 + y);
 		let y = y + 1;	
 		}
 	let x = x +1;
+	let y = 0;
 	}
 	do Screen.setColor(true);
     	return;
