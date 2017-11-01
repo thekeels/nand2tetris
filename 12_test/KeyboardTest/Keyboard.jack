@@ -7,9 +7,10 @@
  * A library for handling user input from the keyboard.
  */
 class Keyboard {
-
+	static Array key;
     /** Initializes the keyboard. */
     function void init() {
+	return;
     } 
 
     /**
@@ -33,6 +34,7 @@ class Keyboard {
      * F1 - F12 = 141 - 152
      */
     function char keyPressed() {
+	return Memory.peek(24576);
     }
 
     /**								
@@ -41,6 +43,28 @@ class Keyboard {
      * of the pressed key.
      */
     function char readChar() {
+	var char codeSaved;
+	var boolean pressed, released;
+	let pressed = false;
+	let codeSaved = 0;
+	let released = false;
+	while(~pressed)
+	{	
+		let codeSaved = Keyboard.keyPressed();
+		if(~(codeSaved = 0))
+		{
+			let pressed = true;
+		}
+	}
+	while(~released)
+	{
+		if(Keyboard.keyPressed() = 0)
+		{
+			let released = true;
+		}
+	}
+	do Output.printChar(codeSaved);
+	return codeSaved;	
     }
 
     /**								
@@ -49,6 +73,33 @@ class Keyboard {
      * and returns its value. Also handles user backspaces.
      */
     function String readLine(String message) {
+	var char code;
+	var boolean newlineReached;
+	var String stringInput;
+	let stringInput = String.new(256);
+	let newlineReached = false;
+	let code = 0;
+	do Output.printString(message);
+	while(~newlineReached)
+	{
+		let code = Keyboard.readChar();
+		if(code = 128)
+		{
+			let newlineReached = true;
+		}
+		else
+		{
+			if(code = 129)
+			{
+				do stringInput.eraseLastChar();
+			}
+			else
+			{
+				do stringInput.appendChar(code);
+			}
+		}
+	}
+    	return stringInput;
     }   
 
     /**								
@@ -58,5 +109,34 @@ class Keyboard {
      * entered text is detected). Also handles user backspaces. 
      */
     function int readInt(String message) {
+	var char code;
+	var String stringInput;
+	var boolean newlineReached;
+	var int codeToInt;
+	let newlineReached = false;
+	let stringInput = String.new(256);
+	let code = 0;
+	do Output.printString(message);
+	while(~newlineReached)
+	{
+		let code = Keyboard.readChar();
+		if(code = 128)
+		{
+			let newlineReached = true;
+		}
+		else
+		{
+			if(code = 129)
+			{
+				do stringInput.eraseLastChar();
+			}
+			else
+			{
+				do stringInput.appendChar(code);
+			}
+		}
+	}
+	let codeToInt = stringInput.intValue();
+    	return codeToInt;
     }
 }
