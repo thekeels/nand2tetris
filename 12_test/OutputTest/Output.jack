@@ -18,9 +18,14 @@ class Output {
 
     // Character map for displaying characters
     static Array charMaps; 
+    static int row, column;
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
+	do Screen.clearScreen();
+	do Output.initMap();
+	do Output.moveCursor(0,0);
+	return;
     }
 
     // Initializes the character map array
@@ -71,7 +76,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,0,0,0,0,0,0,0,0,0,0,0);          // A ** TO BE FILLED **
+        do Output.create(65,12,30,51,51,63,51,51,51,51,0,0); // A ** FILLED **
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -176,28 +181,139 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
+	if (j > 63)
+	{
+		let j = 0;
+		let i = i + 1;
+		if (i > 22)
+		{
+			let i = 0;
+		}
+	}
+	let row = i;
+	let column = j;
+	//do Output.printChar(32);
+	return;
     }
 
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
+	var int y;
+	var Array mapToPrint;
+	let y = 0;
+	let mapToPrint = Output.getMap(c);
+	while (y < 11)
+	{
+		if(mapToPrint[y] & 128 = 128)
+		{	
+			do Screen.drawPixel(column*8 + 7 , row*11 + y);
+		}
+		if(mapToPrint[y] & 64 = 64)
+		{	
+			do Screen.drawPixel(column*8 + 6 , row*11 + y);
+		}
+		if(mapToPrint[y] & 32 = 32)
+		{	
+			do Screen.drawPixel(column*8 + 5 , row*11 + y);
+		}
+		if(mapToPrint[y] & 16 = 16)
+		{	
+			do Screen.drawPixel(column*8 + 4 , row*11 + y);
+		}
+		if(mapToPrint[y] & 8 = 8)
+		{	
+			do Screen.drawPixel(column*8 + 3 , row*11 + y);
+		}
+		if(mapToPrint[y] & 4 = 4)
+		{	
+			do Screen.drawPixel(column*8 + 2 , row*11 + y);
+		}
+		if(mapToPrint[y] & 2 = 2)
+		{	
+			do Screen.drawPixel(column*8 + 1 , row*11 + y);
+		}
+		if(mapToPrint[y] & 1 = 1)
+		{	
+			do Screen.drawPixel(column*8 + 0 , row*11 + y);
+		}
+		let y = y + 1;	
+	}
+	do Output.moveCursor(row, column + 1);
+	return;
+	
     }
 
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+	var int len, count;
+	let len = s.length();
+	let count = 0;
+	while(count < len)
+	{
+	do Output.printChar(s.charAt(count));
+	let count = count + 1;
+	}
+	//do Output.moveCursor(row, column + 1);
+	return;	
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+	var String integerToPrint;
+	var int count, len;
+	let integerToPrint = String.new(20);
+	do integerToPrint.setInt(i);
+	let len = integerToPrint.length();
+	let count = 0;
+	while(count < len)
+	{
+	do Output.printChar(integerToPrint.charAt(count));
+	let count = count + 1;
+	}
+	//do Output.moveCursor(row, column + 1);
+	return;	
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+	let row = row + 1;
+	let column = 0;
+	// do Output.printChar(32);
+	return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+	var int x, y;
+	let y=0;
+	let x=0;
+	if( column = 0)
+	{
+		let column = 63;
+		let row = row - 1;
+		if (row < 0)
+		{
+		let row = 0;
+		}
+	}
+	else
+	{
+		let column = column - 1;
+	}
+	do Screen.setColor(true);
+	while(x<8)
+	{	
+		while (y < 11)
+		{
+		do Screen.drawPixel(column*x + 7 , row*11 + y);
+		let y = y + 1;	
+		}
+	let x = x +1;
+	}
+	do Screen.setColor(true);
+    	return;
     }
 }
