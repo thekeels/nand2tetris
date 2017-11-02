@@ -209,12 +209,12 @@ else
 					if(diff < 0)
 					{
 					let a = a + 1;
-					let diff = diff + dx;
+					let diff = diff + dy;
 					}
 					else
 					{
 					let b = b + 1;
-					let diff = diff - dy;
+					let diff = diff - dx;
 					}
 				}
 			}
@@ -230,12 +230,12 @@ else
 						if(diff < 0)
 						{
 						let a = a - 1;
-						let diff = diff - dx;
+						let diff = diff - dy;
 						}
 						else
 						{
 						let b = b - 1;
-						let diff = diff + dy;
+						let diff = diff + dx;
 						}
 					}
 				}
@@ -249,12 +249,12 @@ else
 							if(diff < 0)
 							{
 							let a = a + 1;
-							let diff = diff - dx;
+							let diff = diff - dy;
 							}
 							else
 							{
 							let b = b - 1;
-							let diff = diff - dy;
+							let diff = diff - dx;
 							}
 						}
 					}
@@ -268,12 +268,12 @@ else
 								if(diff < 0)
 								{
 								let a = a - 1;
-								let diff = diff + dx;
+								let diff = diff + dy;
 								}
 								else
 								{
 								let b = b + 1;
-								let diff = diff + dy;
+								let diff = diff + dx;
 								}
 							}
 						}
@@ -342,10 +342,10 @@ else
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
 	var int dy;
-	let dy = -r;
+	let dy = -(r);
 	while(dy < (r+1))
 	{
-	do Screen.drawLine(x - Math.sqrt(r*r - dy*dy), y + dy, x + Math.sqrt(r*r - dy*dy), y + dy);
+	do Screen.drawLine(x - Math.sqrt( (r*r) - (dy*dy)), y + dy, x + Math.sqrt((r*r) - (dy*dy)), y + dy);
 	let dy = dy + 1;
 	}
 	return;

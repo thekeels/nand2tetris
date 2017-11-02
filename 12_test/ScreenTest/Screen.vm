@@ -578,7 +578,7 @@ push constant 1
 add
 pop local 0
 push local 2
-push local 3
+push local 4
 add
 pop local 2
 goto IF_END3
@@ -588,7 +588,7 @@ push constant 1
 add
 pop local 1
 push local 2
-push local 4
+push local 3
 sub
 pop local 2
 label IF_END3
@@ -637,7 +637,7 @@ push constant 1
 sub
 pop local 0
 push local 2
-push local 3
+push local 4
 sub
 pop local 2
 goto IF_END5
@@ -647,7 +647,7 @@ push constant 1
 sub
 pop local 1
 push local 2
-push local 4
+push local 3
 add
 pop local 2
 label IF_END5
@@ -696,7 +696,7 @@ push constant 1
 add
 pop local 0
 push local 2
-push local 3
+push local 4
 sub
 pop local 2
 goto IF_END7
@@ -706,7 +706,7 @@ push constant 1
 sub
 pop local 1
 push local 2
-push local 4
+push local 3
 sub
 pop local 2
 label IF_END7
@@ -755,7 +755,7 @@ push constant 1
 sub
 pop local 0
 push local 2
-push local 3
+push local 4
 add
 pop local 2
 goto IF_END9
@@ -765,7 +765,7 @@ push constant 1
 add
 pop local 1
 push local 2
-push local 4
+push local 3
 add
 pop local 2
 label IF_END9
@@ -907,9 +907,9 @@ push argument 2
 push argument 2
 call Math.multiply 2
 push local 0
-sub
 push local 0
 call Math.multiply 2
+sub
 call Math.sqrt 1
 sub
 push argument 1
@@ -920,9 +920,9 @@ push argument 2
 push argument 2
 call Math.multiply 2
 push local 0
-sub
 push local 0
 call Math.multiply 2
+sub
 call Math.sqrt 1
 add
 push argument 1
