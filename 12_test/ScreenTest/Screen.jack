@@ -40,9 +40,15 @@ class Screen {
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
 	var int memValue, memLocation, modX, var1;
-	let var1 = x/16;
-	let modX = x - (16 * var1);
-	let memLocation = 16384 + (y * 32) + (var1);
+	let modX = x;
+	while( (modX > 16) | (modX = 16))
+	{
+	let modX = modX - 16;
+	}
+
+	//let var1 = x/16;
+	//let modX = x - (16 * var1);
+	let memLocation = 16384 + (y * 32) + (x/16);
 	let memValue = Memory.peek(memLocation);
 
 if(color){

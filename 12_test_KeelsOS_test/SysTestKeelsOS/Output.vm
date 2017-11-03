@@ -1510,50 +1510,12 @@ push argument 1
 pop static 2
 push constant 0
 return
-function Output.printChar 4
+function Output.printChar 2
 push constant 0
 pop local 0
 push argument 0
 call Output.getMap 1
-pop local 3
-push static 2
-push static 2
-add
-push static 2
-add
-push static 2
-add
-push static 2
-add
-push static 2
-add
-push static 2
-add
-push static 2
-add
 pop local 1
-push static 1
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-pop local 2
 label WHILE_EXP0
 push local 0
 push constant 11
@@ -1561,7 +1523,7 @@ lt
 not
 if-goto WHILE_END0
 push local 0
-push local 3
+push local 1
 add
 pop pointer 1
 push that 0
@@ -1572,17 +1534,21 @@ eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push local 1
+push static 2
+push constant 8
+call Math.multiply 2
 push constant 7
 add
-push local 2
+push static 1
+push constant 11
+call Math.multiply 2
 push local 0
 add
 call Screen.drawPixel 2
 pop temp 0
 label IF_FALSE0
 push local 0
-push local 3
+push local 1
 add
 pop pointer 1
 push that 0
@@ -1593,17 +1559,21 @@ eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
-push local 1
+push static 2
+push constant 8
+call Math.multiply 2
 push constant 6
 add
-push local 2
+push static 1
+push constant 11
+call Math.multiply 2
 push local 0
 add
 call Screen.drawPixel 2
 pop temp 0
 label IF_FALSE1
 push local 0
-push local 3
+push local 1
 add
 pop pointer 1
 push that 0
@@ -1614,17 +1584,21 @@ eq
 if-goto IF_TRUE2
 goto IF_FALSE2
 label IF_TRUE2
-push local 1
+push static 2
+push constant 8
+call Math.multiply 2
 push constant 5
 add
-push local 2
+push static 1
+push constant 11
+call Math.multiply 2
 push local 0
 add
 call Screen.drawPixel 2
 pop temp 0
 label IF_FALSE2
 push local 0
-push local 3
+push local 1
 add
 pop pointer 1
 push that 0
@@ -1635,17 +1609,21 @@ eq
 if-goto IF_TRUE3
 goto IF_FALSE3
 label IF_TRUE3
-push local 1
+push static 2
+push constant 8
+call Math.multiply 2
 push constant 4
 add
-push local 2
+push static 1
+push constant 11
+call Math.multiply 2
 push local 0
 add
 call Screen.drawPixel 2
 pop temp 0
 label IF_FALSE3
 push local 0
-push local 3
+push local 1
 add
 pop pointer 1
 push that 0
@@ -1656,17 +1634,21 @@ eq
 if-goto IF_TRUE4
 goto IF_FALSE4
 label IF_TRUE4
-push local 1
+push static 2
+push constant 8
+call Math.multiply 2
 push constant 3
 add
-push local 2
+push static 1
+push constant 11
+call Math.multiply 2
 push local 0
 add
 call Screen.drawPixel 2
 pop temp 0
 label IF_FALSE4
 push local 0
-push local 3
+push local 1
 add
 pop pointer 1
 push that 0
@@ -1677,17 +1659,21 @@ eq
 if-goto IF_TRUE5
 goto IF_FALSE5
 label IF_TRUE5
-push local 1
+push static 2
+push constant 8
+call Math.multiply 2
 push constant 2
 add
-push local 2
+push static 1
+push constant 11
+call Math.multiply 2
 push local 0
 add
 call Screen.drawPixel 2
 pop temp 0
 label IF_FALSE5
 push local 0
-push local 3
+push local 1
 add
 pop pointer 1
 push that 0
@@ -1698,17 +1684,21 @@ eq
 if-goto IF_TRUE6
 goto IF_FALSE6
 label IF_TRUE6
-push local 1
+push static 2
+push constant 8
+call Math.multiply 2
 push constant 1
 add
-push local 2
+push static 1
+push constant 11
+call Math.multiply 2
 push local 0
 add
 call Screen.drawPixel 2
 pop temp 0
 label IF_FALSE6
 push local 0
-push local 3
+push local 1
 add
 pop pointer 1
 push that 0
@@ -1719,10 +1709,14 @@ eq
 if-goto IF_TRUE7
 goto IF_FALSE7
 label IF_TRUE7
-push local 1
+push static 2
+push constant 8
+call Math.multiply 2
 push constant 0
 add
-push local 2
+push static 1
+push constant 11
+call Math.multiply 2
 push local 0
 add
 call Screen.drawPixel 2
@@ -1808,7 +1802,7 @@ push constant 0
 pop static 2
 push constant 0
 return
-function Output.backSpace 4
+function Output.backSpace 2
 push constant 0
 pop local 1
 push constant 0
@@ -1841,44 +1835,6 @@ push constant 1
 sub
 pop static 2
 label IF_END0
-push static 2
-push static 2
-add
-push static 2
-add
-push static 2
-add
-push static 2
-add
-push static 2
-add
-push static 2
-add
-push static 2
-add
-pop local 2
-push static 1
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-push static 1
-add
-pop local 3
 push constant 0
 call Screen.setColor 1
 pop temp 0

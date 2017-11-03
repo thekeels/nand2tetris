@@ -33,31 +33,21 @@ push constant 0
 return
 function Screen.drawPixel 4
 push argument 0
-pop local 2
-label WHILE_EXP0
-push local 2
 push constant 16
-gt
-push local 2
+call Math.divide 2
+pop local 3
+push argument 0
 push constant 16
-eq
-or
-not
-if-goto WHILE_END0
-push local 2
-push constant 16
+push local 3
+call Math.multiply 2
 sub
 pop local 2
-goto WHILE_EXP0
-label WHILE_END0
 push constant 16384
 push argument 1
 push constant 32
 call Math.multiply 2
 add
-push argument 0
-push constant 16
-call Math.divide 2
+push local 3
 add
 pop local 1
 push local 1
