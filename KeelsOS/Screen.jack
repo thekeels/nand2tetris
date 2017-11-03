@@ -1,0 +1,353 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Screen.jack
+
+/**
+ * A library of functions for displaying graphics on the screen.
+ * The Hack physical screen consists of 512 rows (indexed 0..511, top to bottom)
+ * of 256 pixels each (indexed 0..255, left to right). The top left pixel on 
+ * the screen is indexed (0,0).
+ */
+class Screen {
+
+	static boolean color;
+    /** Initializes the Screen. */
+    function void init() {
+	do Screen.setColor(true);
+	return;
+    }
+
+    /** Erases the entire screen. */
+    function void clearScreen() {
+	var int count;
+	let count = 16384;
+	while (count < 24576)
+	{
+	do Memory.poke(count, 0);
+	let count = count + 1;
+	}
+	return;
+    }
+
+    /** Sets the current color, to be used for all subsequent drawXXX commands.
+     *  Black is represented by true, white by false. */
+    function void setColor(boolean b) {
+	let color = b;
+	return;
+    }
+
+    /** Draws the (x,y) pixel, using the current color. */
+    function void drawPixel(int x, int y) {
+	var int memValue, memLocation, modX, var1;
+	let var1 = x/16;
+	let modX = x - (16 * var1);
+	let memLocation = 16384 + (y * 32) + (var1);
+	let memValue = Memory.peek(memLocation);
+
+if(color){
+	if(modX = 15)
+	{
+		do Memory.poke(memLocation, memValue | (32767+1));
+	}
+	if(modX = 14)
+	{
+		do Memory.poke(memLocation, memValue | 16384);
+	}
+	if(modX = 13)
+	{
+		do Memory.poke(memLocation, memValue | 8192);
+	}
+	if(modX = 12)
+	{
+		do Memory.poke(memLocation, memValue | 4096);
+	}
+	if(modX = 11)
+	{
+		do Memory.poke(memLocation, memValue | 2048);
+	}
+	if(modX = 10)
+	{
+		do Memory.poke(memLocation, memValue | 1024);
+	}
+	if(modX = 9)
+	{
+		do Memory.poke(memLocation, memValue | 512);
+	}
+	if(modX = 8)
+	{
+		do Memory.poke(memLocation, memValue | 256);
+	}
+	if(modX = 7)
+	{
+		do Memory.poke(memLocation, memValue | 128);
+	}
+	if(modX = 6)
+	{
+		do Memory.poke(memLocation, memValue | 64);
+	}
+	if(modX = 5)
+	{
+		do Memory.poke(memLocation, memValue | 32);
+	}
+	if(modX = 4)
+	{
+		do Memory.poke(memLocation, memValue | 16);
+	}
+	if(modX = 3)
+	{
+		do Memory.poke(memLocation, memValue | 8);
+	}
+	if(modX = 2)
+	{
+		do Memory.poke(memLocation, memValue | 4);
+	}
+	if(modX = 1)
+	{
+		do Memory.poke(memLocation, memValue | 2);
+	}
+	if(modX = 0)
+	{
+		do Memory.poke(memLocation, memValue | 1);
+	}
+}
+else
+{
+	if(modX = 15)
+	{
+		do Memory.poke(memLocation, (memValue & 32767) );
+	}
+	if(modX = 14)
+	{
+		do Memory.poke(memLocation, (memValue & -16385) );
+	}
+	if(modX = 13)
+	{
+		do Memory.poke(memLocation, (memValue & -8193) );
+	}
+	if(modX = 12)
+	{
+		do Memory.poke(memLocation, (memValue & -4097) );
+	}
+	if(modX = 11)
+	{
+		do Memory.poke(memLocation, (memValue & -2049) );
+	}
+	if(modX = 10)
+	{
+		do Memory.poke(memLocation, (memValue & -1025) );
+	}
+	if(modX = 9)
+	{
+		do Memory.poke(memLocation, (memValue & -513) );
+	}
+	if(modX = 8)
+	{
+		do Memory.poke(memLocation, (memValue & -257) );
+	}
+	if(modX = 7)
+	{
+		do Memory.poke(memLocation, (memValue & -129) );
+	}
+	if(modX = 6)
+	{
+		do Memory.poke(memLocation, (memValue & -65) );
+	}
+	if(modX = 5)
+	{
+		do Memory.poke(memLocation, (memValue & -33) );
+	}
+	if(modX = 4)
+	{
+		do Memory.poke(memLocation, (memValue & -17) );
+	}
+	if(modX = 3)
+	{
+		do Memory.poke(memLocation, (memValue & -9) );
+	}
+	if(modX = 2)
+	{
+		do Memory.poke(memLocation, (memValue & -5) );
+	}
+	if(modX = 1)
+	{
+		do Memory.poke(memLocation, (memValue & -3) );
+	}
+	if(modX = 0)
+	{
+		do Memory.poke(memLocation, (memValue & -2) );
+	}
+}
+	return; 
+    }
+
+    /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+	var int a, b, diff, dx, dy;
+	let a = 0;
+	let b = 0;
+	let dx = x2 - x1;
+	let dy = y2 - y1;
+	if(dx = 0)
+	{
+		do Screen.drawVertLine(x1,y1,x2,y2);
+	}
+	else
+	{
+		if(dy = 0)
+		{
+			do Screen.drawHorizLine(x1,y1,x2);
+		}	
+		else
+		{
+			let diff = 0;
+			if( (dx > 0) & (dy > 0))
+			{
+				while( ~(a > dx) & ~(b > dy))
+				{
+					do Screen.drawPixel(x1 + a, y1 + b);
+					if(diff < 0)
+					{
+					let a = a + 1;
+					let diff = diff + dy;
+					}
+					else
+					{
+					let b = b + 1;
+					let diff = diff - dx;
+					}
+				}
+			}
+			else
+			{
+				if( (dx < 0) & (dy < 0))
+				{
+	
+
+					while( ~(a < dx) & ~(b < dy))
+					{
+						do Screen.drawPixel(x1 + a, y1 + b);
+						if(diff < 0)
+						{
+						let a = a - 1;
+						let diff = diff - dy;
+						}
+						else
+						{
+						let b = b - 1;
+						let diff = diff + dx;
+						}
+					}
+				}
+				else
+				{
+					if( (dx > 0) & (dy < 0))
+					{
+						while( ~(a > dx) & ~(b < dy))
+						{
+							do Screen.drawPixel(x1 + a, y1 + b);
+							if(diff < 0)
+							{
+							let a = a + 1;
+							let diff = diff - dy;
+							}
+							else
+							{
+							let b = b - 1;
+							let diff = diff - dx;
+							}
+						}
+					}
+					else
+					{
+						if( (dx < 0) & (dy > 0))
+						{
+							while( ~(a < dx) & ~(b > dy))
+							{
+								do Screen.drawPixel(x1 + a, y1 + b);
+								if(diff < 0)
+								{
+								let a = a - 1;
+								let diff = diff + dy;
+								}
+								else
+								{
+								let b = b + 1;
+								let diff = diff + dx;
+								}
+							}
+						}
+					}
+				}
+		
+			}
+		}
+	}   
+	return; 
+}
+
+    function void drawVertLine(int x1, int y1, int x2, int y2) {
+	if(y1 > y2)
+	{
+		while(y1 > y2)
+		{
+		do Screen.drawPixel(x1,y1);
+		let y1 = y1 - 1;
+		}
+	}
+	else
+	{
+		while(y1 < y2)
+		{
+		do Screen.drawPixel(x1,y1);
+		let y1 = y1 + 1;
+		}
+	}
+
+	return;
+    }
+	
+    function void drawHorizLine(int x1, int y, int x2) {
+	if(x1 > x2)
+	{
+		while(x1 > x2)
+		{
+		do Screen.drawPixel(x1, y);
+		let x1 = x1 - 1;
+		}
+	}
+	else
+	{
+		while(x1 < x2)
+		{
+		do Screen.drawPixel(x1,y);
+		let x1 = x1 + 1;
+		}
+	}
+
+	return;
+    }
+	
+    /** Draws a filled rectangle whose top left corner is (x1, y1)
+     * and bottom right corner is (x2,y2), using the current color. */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+	while(x1 < (x2 + 1) )
+	{
+		do Screen.drawVertLine(x1,y1,x2,y2);
+		let x1 = x1 + 1;
+	}
+	return;
+    }
+
+    /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
+    function void drawCircle(int x, int y, int r) {
+	var int dy;
+	let dy = -(r);
+	while(dy < (r+1))
+	{
+	do Screen.drawLine(x - Math.sqrt( (r*r) - (dy*dy)), y + dy, x + Math.sqrt((r*r) - (dy*dy)), y + dy);
+	let dy = dy + 1;
+	}
+	return;
+    }
+}
